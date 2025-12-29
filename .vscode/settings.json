@@ -1,0 +1,7 @@
+{
+    "git.alwaysShowStagedChangesResourceGroup": true,
+    "git.alwaysSignOff": true,
+    "git.autofetch": "all",
+    "npm.enableRunFromFolder": true,
+    "npm.runSilent": false
+}
