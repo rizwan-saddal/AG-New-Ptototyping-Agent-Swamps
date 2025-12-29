@@ -37,15 +37,18 @@ Build a premium, cross-platform capable Web GUI for the "Agent Swamps" system—
 - [ ] Implement `AgentService` (Mock data generator for the prototype)
 
 ### Phase 3: The Swamp Interface
+
 - [ ] Implement the dynamic grid/graph view of agents
 - [ ] Add animations (floating, pulsing connections)
 - [ ] Connect mock data to visualizer
 
 ### Phase 4: Dashboard & Polish
+
 - [ ] Add statistical widgets
 - [ ] Refine aesthetics (Glass effects, glowing borders)
 - [ ] Finalize responsive design
 
 ## Design Aesthetics provided by User
+
 - **Theme**: Premium Dark Mode, Glassmorphism.
 - **Vibe**: "Alive", localized animations, "Wow" factor.
