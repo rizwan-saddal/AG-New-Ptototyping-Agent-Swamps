@@ -8,7 +8,9 @@ export enum AgentType {
   DESIGNER = 'DESIGNER',
   MARKETING = 'MARKETING',
   TECH_WRITER = 'TECH_WRITER',
-  RESEARCH = 'RESEARCH'
+  RESEARCH = 'RESEARCH',
+  SEO = 'SEO',
+  LEAD_GENERATION = 'LEAD_GENERATION'
 }
 
 export enum AgentStatus {
@@ -31,6 +33,9 @@ export enum TaskType {
   DESIGN = 'DESIGN',
   DOCUMENTATION = 'DOCUMENTATION',
   RESEARCH = 'RESEARCH',
+  SEO_OPTIMIZATION = 'SEO_OPTIMIZATION',
+  LEAD_GENERATION = 'LEAD_GENERATION',
+  CONTENT_MARKETING = 'CONTENT_MARKETING',
   GENERAL = 'GENERAL'
 }
 
@@ -155,4 +160,96 @@ export interface TaskAnalysis {
   potentialChallenges: string[];
   recommendedApproach: string;
   additionalInfo: Record<string, any>;
+}
+
+// Agent Management System Types
+
+export interface AgentTrainingData {
+  taskId: string;
+  input: string;
+  output: string;
+  success: boolean;
+  feedback?: string;
+  timestamp: Date;
+}
+
+export interface AgentLearningProfile {
+  agentId: string;
+  trainingHistory: AgentTrainingData[];
+  strengthAreas: string[];
+  improvementAreas: string[];
+  preferredTaskTypes: TaskType[];
+  learningRate: number;
+  lastTrainingDate: Date;
+}
+
+export interface AgentTemplate {
+  id: string;
+  name: string;
+  type: AgentType;
+  description: string;
+  defaultCapabilities: string[];
+  defaultSpecializations: string[];
+  promptTemplate: string;
+  trainingStrategy?: 'supervised' | 'reinforced' | 'continuous';
+}
+
+export interface WorkflowTemplate {
+  id: string;
+  name: string;
+  description: string;
+  steps: WorkflowStep[];
+  requiredAgentTypes: AgentType[];
+  estimatedDuration?: number;
+  category: 'development' | 'marketing' | 'operations' | 'custom';
+}
+
+export interface WorkflowStep {
+  id: string;
+  name: string;
+  agentType: AgentType;
+  taskType: TaskType;
+  dependencies: string[];
+  inputs: Record<string, any>;
+  expectedOutputs: string[];
+}
+
+export interface WorkflowExecution {
+  id: string;
+  templateId: string;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  currentStep: number;
+  steps: WorkflowStepExecution[];
+  startedAt: Date;
+  completedAt?: Date;
+  results: Record<string, any>;
+}
+
+export interface WorkflowStepExecution {
+  stepId: string;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  assignedAgentId?: string;
+  taskId?: string;
+  result?: any;
+  error?: string;
+}
+
+export interface ReinforcementTrainingConfig {
+  agentId: string;
+  modelProvider: string;
+  trainingDataset: AgentTrainingData[];
+  rewardFunction: (result: any, expected: any) => number;
+  epochs: number;
+  learningRate: number;
+  batchSize: number;
+}
+
+export interface AgentCreationRequest {
+  name: string;
+  type: AgentType;
+  templateId?: string;
+  customCapabilities?: string[];
+  customSpecializations?: string[];
+  trainingStrategy?: 'supervised' | 'reinforced' | 'continuous';
+  initialTrainingData?: AgentTrainingData[];
 }

@@ -7,13 +7,17 @@ import { GeminiProvider } from './models/GeminiProvider.js';
 import { DeveloperAgent } from './agents/DeveloperAgent.js';
 import { QAAgent } from './agents/QAAgent.js';
 import { ProductManagerAgent } from './agents/ProductManagerAgent.js';
+import { SEOAgent } from './agents/SEOAgent.js';
+import { LeadGenerationAgent } from './agents/LeadGenerationAgent.js';
+import { AgentManagementSystem } from './orchestration/AgentManagementSystem.js';
+import { WorkflowManagementSystem } from './orchestration/WorkflowManagementSystem.js';
 import { APIServer } from './api/APIServer.js';
 
 // Load environment variables
 dotenv.config();
 
 async function main() {
-  console.log('🌊 Starting Agent Swamps System...\n');
+  console.log('🌊 Starting Agent Swamps Management System...\n');
 
   // Initialize Model Router
   const modelRouter = new ModelRouter();
@@ -37,6 +41,17 @@ async function main() {
   const orchestrator = new Orchestrator();
   const registry = orchestrator.getRegistry();
 
+  // Initialize Agent Management System
+  console.log('\n🎓 Initializing Agent Management System...');
+  const agentManagement = new AgentManagementSystem(modelRouter);
+  console.log('  ✓ Agent Management System ready');
+
+  // Initialize Workflow Management System
+  console.log('\n⚙️ Initializing Workflow Management System...');
+  const workflowManagement = new WorkflowManagementSystem(orchestrator);
+  console.log('  ✓ Workflow Management System ready');
+  console.log(`  ✓ ${workflowManagement.listTemplates().length} predefined workflow templates loaded`);
+
   // Register agents
   console.log('\n📦 Registering agents...');
   
@@ -45,26 +60,35 @@ async function main() {
     frameworks: ['React', 'Node.js', 'Express', 'FastAPI', 'Spring Boot']
   });
   registry.registerAgent(developerAgent);
+  agentManagement.initializeLearningProfile(developerAgent.id, 'continuous');
   console.log('  ✓ Developer Agent registered');
 
   const qaAgent = new QAAgent(modelRouter, {
     frameworks: ['Jest', 'Vitest', 'Pytest', 'JUnit', 'Mocha']
   });
   registry.registerAgent(qaAgent);
+  agentManagement.initializeLearningProfile(qaAgent.id, 'continuous');
   console.log('  ✓ QA Agent registered');
 
   const pmAgent = new ProductManagerAgent(modelRouter);
   registry.registerAgent(pmAgent);
+  agentManagement.initializeLearningProfile(pmAgent.id, 'continuous');
   console.log('  ✓ Product Manager Agent registered');
 
-  // Additional agents can be registered here
-  // const devopsAgent = new DevOpsAgent(modelRouter);
-  // registry.registerAgent(devopsAgent);
+  const seoAgent = new SEOAgent(modelRouter);
+  registry.registerAgent(seoAgent);
+  agentManagement.initializeLearningProfile(seoAgent.id, 'continuous');
+  console.log('  ✓ SEO Agent registered');
 
-  // Start API Server
+  const leadGenAgent = new LeadGenerationAgent(modelRouter);
+  registry.registerAgent(leadGenAgent);
+  agentManagement.initializeLearningProfile(leadGenAgent.id, 'continuous');
+  console.log('  ✓ Lead Generation Agent registered');
+
+  // Start API Server with management systems
   console.log('\n🌐 Starting API Server...');
   const port = parseInt(process.env.PORT || '3000', 10);
-  const apiServer = new APIServer(orchestrator, port);
+  const apiServer = new APIServer(orchestrator, port, agentManagement, workflowManagement);
   apiServer.start();
 
   // Display system status
@@ -74,15 +98,41 @@ async function main() {
   console.log(`   Available Agents: ${stats.agents.availableAgents}`);
   console.log(`   Agent Types:`, stats.agents.agentsByType);
 
-  console.log('\n✨ Agent Swamps is ready!\n');
-  console.log('Try submitting a task:');
-  console.log('  POST http://localhost:' + port + '/api/tasks');
-  console.log('  {');
-  console.log('    "title": "Create a Hello World app",');
-  console.log('    "description": "Create a simple Node.js Hello World application",');
-  console.log('    "type": "CODE_GENERATION",');
-  console.log('    "priority": "MEDIUM"');
-  console.log('  }\n');
+  console.log('\n📋 Available Features:');
+  console.log('   ✓ Agent Training & Learning');
+  console.log('   ✓ Workflow Automation');
+  console.log('   ✓ Agent Creation from Templates');
+  console.log('   ✓ Reinforcement Learning');
+  console.log('   ✓ Behavior-Based Selection');
+
+  console.log('\n✨ Agent Swamps Management System is ready!\n');
+  console.log('Example API Calls:');
+  console.log('\n1. Submit a task:');
+  console.log('   POST http://localhost:' + port + '/api/tasks');
+  console.log('   {');
+  console.log('     "title": "Create a Hello World app",');
+  console.log('     "description": "Create a simple Node.js Hello World application",');
+  console.log('     "type": "CODE_GENERATION",');
+  console.log('     "priority": "MEDIUM"');
+  console.log('   }');
+  
+  console.log('\n2. Execute a workflow:');
+  console.log('   POST http://localhost:' + port + '/api/workflows/execute');
+  console.log('   {');
+  console.log('     "templateId": "software-development",');
+  console.log('     "inputs": { "description": "Build a todo app" }');
+  console.log('   }');
+
+  console.log('\n3. Create a new agent:');
+  console.log('   POST http://localhost:' + port + '/api/agents/create');
+  console.log('   {');
+  console.log('     "name": "Custom SEO Agent",');
+  console.log('     "type": "SEO",');
+  console.log('     "templateId": "seo-template"');
+  console.log('   }');
+
+  console.log('\n4. List workflow templates:');
+  console.log('   GET http://localhost:' + port + '/api/workflows/templates\n');
 
   // Graceful shutdown
   process.on('SIGINT', () => {
