@@ -1,20 +1,40 @@
-# Agent Swamps - End-to-End Multi-Agent System
+# Agent Swamps - AI Agent Management & Orchestration Platform
 
-> A comprehensive multi-agent orchestration platform powered by open AI models, featuring intelligent agent selection, behavior-based routing, and real-time collaboration.
+> A comprehensive AI agent management system with training, fine-tuning, workflow automation, and intelligent orchestration powered by open AI models.
 
 ## 🌟 Overview
 
-Agent Swamps is not just a frontend—it's a complete end-to-end solution for autonomous software development through coordinated AI agents. The system uses open models (like Google Gemini) as the engine for all agents, with sophisticated orchestration that selects agents based on their behavior, performance history, and specialization.
+Agent Swamps is a **complete agent management platform** that goes beyond simple orchestration. Create, train, fine-tune, and automate multi-agent workflows for software development, marketing, operations, and more. The system uses open models (like Google Gemini) with continuous learning capabilities and behavior-based agent selection.
 
 ### Key Features
 
-- **🤖 Multi-Agent Architecture**: Specialized agents for different roles (Developer, QA, Product Manager, DevOps, etc.)
+- **🎓 Agent Training & Learning**: Continuous learning from task execution with reinforcement training support
+- **🤖 Agent Creation**: Create specialized agents from templates or build custom agents
+- **⚙️ Workflow Automation**: Predefined workflows for common organizational processes
+- **🎯 Intelligent Selection**: Behavior-based routing using performance metrics and specialization matching
 - **🧠 Open Model Integration**: Model-agnostic design supporting Google Gemini, OpenAI, Anthropic, and local models
-- **🎯 Intelligent Agent Selection**: Behavior-based routing using performance metrics, specialization matching, and load balancing
 - **🔄 Real-time Orchestration**: Dynamic task distribution and agent coordination
-- **📊 Live Monitoring**: WebSocket-powered dashboard showing agent activity, task progress, and system metrics
-- **📈 Performance Tracking**: Historical analysis of agent behavior for continuous improvement
-- **🌐 Complete API**: REST and WebSocket APIs for full system control
+- **📊 Performance Analytics**: Detailed insights into agent strengths, improvements, and learning progress
+- **🌐 Complete API**: REST and WebSocket APIs for all management and orchestration features
+
+## 🆕 Agent Management System
+
+### Training & Fine-Tuning
+- **Continuous Learning**: All agents learn from every task they execute
+- **Reinforcement Learning**: Custom reward functions for specialized training
+- **Adaptive Learning Rates**: Automatically adjust based on performance
+- **Learning Profiles**: Track strengths, improvements, and preferred task types
+
+### Agent Creation
+- **Template-Based**: Create agents from predefined templates
+- **Custom Capabilities**: Define specialized skills and focus areas
+- **Training Strategies**: Choose between supervised, reinforced, or continuous learning
+
+### Workflow Automation
+- **4 Predefined Workflows**: Software Development, Marketing Campaign, Website Launch, Product Launch
+- **Custom Workflows**: Build multi-step automated processes
+- **Dependency Management**: Handle complex workflows with step dependencies
+- **Progress Tracking**: Monitor workflow execution in real-time
 
 ## 🏗️ Architecture
 
@@ -23,23 +43,26 @@ The system is built on a layered architecture:
 ```
 ┌─────────────────────────────────────────┐
 │      Frontend (React + TypeScript)      │
-│   Real-time Swamp Visualization         │
+│   Real-time Visualization & Management  │
 └─────────────────────────────────────────┘
                   ↕
 ┌─────────────────────────────────────────┐
 │         API Layer (REST + WS)           │
+│  Tasks | Agents | Training | Workflows  │
 └─────────────────────────────────────────┘
                   ↕
 ┌─────────────────────────────────────────┐
-│      Orchestration Engine               │
+│      Management & Orchestration         │
+│  - Agent Management System              │
+│  - Workflow Management System           │
 │  - Agent Selection & Routing            │
-│  - Task Queue Management                │
-│  - Performance Tracking                 │
+│  - Performance Tracking & Learning      │
 └─────────────────────────────────────────┘
                   ↕
 ┌─────────────────────────────────────────┐
-│         Agent Layer                      │
-│  Developer | QA | PM | DevOps | ...     │
+│         Agent Layer (5 Types)           │
+│  Developer | QA | PM | SEO | Lead Gen   │
+│  All with continuous learning           │
 └─────────────────────────────────────────┘
                   ↕
 ┌─────────────────────────────────────────┐
@@ -50,9 +73,12 @@ The system is built on a layered architecture:
 
 ## 📚 Documentation
 
+- **[AGENT_MANAGEMENT_GUIDE.md](./AGENT_MANAGEMENT_GUIDE.md)**: Complete guide to agent training, creation, and workflows
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)**: High-level system architecture and design principles
 - **[CLASS_DIAGRAMS.md](./CLASS_DIAGRAMS.md)**: Detailed class diagrams with relationships
 - **[LOW_LEVEL_DESIGN.md](./LOW_LEVEL_DESIGN.md)**: Implementation details, algorithms, and data structures
+- **[FLOW_DIAGRAMS.md](./FLOW_DIAGRAMS.md)**: System flow visualizations
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)**: Production deployment guide
 - **[backend/README.md](./backend/README.md)**: Backend API documentation and usage
 
 ## 🚀 Quick Start
@@ -111,6 +137,58 @@ The frontend will start on `http://localhost:5173`
 
 ## 💡 Usage Examples
 
+### Create a New Agent
+
+```bash
+curl -X POST http://localhost:3000/api/agents/create \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "E-commerce SEO Specialist",
+    "type": "SEO",
+    "templateId": "seo-template",
+    "customCapabilities": ["product-seo", "local-seo"],
+    "customSpecializations": ["shopify", "woocommerce"],
+    "trainingStrategy": "continuous"
+  }'
+```
+
+### Execute a Workflow
+
+```bash
+curl -X POST http://localhost:3000/api/workflows/execute \
+  -H "Content-Type: application/json" \
+  -d '{
+    "templateId": "software-development",
+    "inputs": {
+      "description": "Build a real-time chat application with React and Node.js"
+    }
+  }'
+```
+
+### Train an Agent
+
+```bash
+curl -X POST http://localhost:3000/api/agents/{agentId}/train \
+  -H "Content-Type: application/json" \
+  -d '{
+    "trainingData": [
+      {
+        "taskId": "task-1",
+        "input": "Create a REST API",
+        "output": "/* code here */",
+        "success": true,
+        "feedback": "Excellent implementation"
+      }
+    ]
+  }'
+```
+
+### Get Agent Insights
+
+```bash
+curl http://localhost:3000/api/agents/{agentId}/insights
+```
+
 ### Submit a Code Generation Task
 
 ```bash
@@ -163,25 +241,56 @@ This ensures:
 
 ## 🤖 Available Agents
 
+## 🤖 Available Agents
+
 ### Currently Implemented
 
-1. **Developer Agent**
-   - Code generation
+1. **Developer Agent** 🔧
+   - Code generation and scaffolding
    - Code review and refactoring
    - Debugging assistance
-   - Supports: JavaScript, TypeScript, Python, Java, Go
+   - Best practices recommendations
+   - **Supports**: JavaScript, TypeScript, Python, Java, Go
+   - **Frameworks**: React, Node.js, Express, FastAPI, Spring Boot
 
-2. **QA Agent**
+2. **QA Agent** ✅
    - Test case generation
    - Test plan creation
-   - Quality assurance
-   - Supports: Jest, Vitest, Pytest, JUnit
+   - Quality assurance reviews
+   - Bug reporting and analysis
+   - **Supports**: Jest, Vitest, Pytest, JUnit, Mocha
 
-3. **Product Manager Agent**
+3. **Product Manager Agent** 📋
    - Requirements analysis
-   - Task prioritization
+   - Task prioritization (MoSCoW method)
    - Roadmap planning
    - Stakeholder management
+   - Sprint planning
+
+4. **SEO Agent** 🔍 *(NEW)*
+   - Keyword research and strategy
+   - On-page SEO optimization
+   - Technical SEO audits
+   - Content optimization
+   - Meta tags and schema markup
+   - Competitor analysis
+
+5. **Lead Generation Agent** 📈 *(NEW)*
+   - Campaign strategy and planning
+   - Funnel design and optimization
+   - Email marketing and nurture campaigns
+   - Landing page optimization
+   - Lead scoring and segmentation
+   - Multi-channel campaigns
+
+### Agent Capabilities
+
+All agents support:
+- ✅ Continuous learning from task execution
+- ✅ Performance tracking and insights
+- ✅ Custom specializations
+- ✅ Template-based creation
+- ✅ Reinforcement training
 
 ### Coming Soon
 
