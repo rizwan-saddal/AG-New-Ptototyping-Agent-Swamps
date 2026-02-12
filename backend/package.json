@@ -1,0 +1,49 @@
+{
+  "name": "agent-swamps-backend",
+  "version": "1.0.0",
+  "description": "End-to-end multi-agent orchestration system with open model integration",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "orchestration",
+    "gemini",
+    "multi-agent"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "dotenv": "^16.4.5",
+    "zod": "^3.22.4",
+    "uuid": "^9.0.1",
+    "pg": "^8.11.3",
+    "redis": "^4.6.13",
+    "winston": "^3.11.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.19",
+    "@types/uuid": "^9.0.8",
+    "@types/cors": "^2.8.17",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.1",
+    "vitest": "^1.3.1",
+    "prettier": "^3.2.5",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0"
+  }
+}
