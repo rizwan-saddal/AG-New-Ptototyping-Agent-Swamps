@@ -67,6 +67,28 @@ Complete guide for local LLM integration.
 ### 6. [Implementation Plan](./implementation_plan.md)
 GUI implementation roadmap and phases.
 
+### 7. [System Workflows](./WORKFLOWS.md)
+Detailed workflow diagrams and process flows.
+- Complete system workflow
+- Agent collaboration patterns
+- Real-time update mechanisms
+- Ollama integration flow
+- Task decomposition process
+- Agent lifecycle management
+- Message flow patterns
+- Error handling strategies
+- Deployment workflow
+- Data persistence flow
+
+### 8. [Documentation Navigation](./NAVIGATION.md)
+Guide to navigating all documentation.
+- Navigation flowchart
+- Quick reference guide
+- Use case scenarios
+- Documentation matrix
+- Search guide
+- Diagram index
+
 ## 🏗️ System Architecture (High-Level)
 
 ```
@@ -289,12 +311,28 @@ REDIS_URL=redis://localhost:6379
 │   ├── Ollama Integration
 │   └── WebSocket Protocol
 │
-└── OLLAMA_INTEGRATION.md
-    ├── Overview & Setup
-    ├── Architecture Integration
-    ├── Model Selection
-    ├── Implementation Guide
-    └── Deployment Strategy
+├── OLLAMA_INTEGRATION.md
+│   ├── Overview & Setup
+│   ├── Architecture Integration
+│   ├── Model Selection
+│   ├── Implementation Guide
+│   └── Deployment Strategy
+│
+├── WORKFLOWS.md
+│   ├── Complete System Workflow
+│   ├── Agent Collaboration
+│   ├── Real-time Updates
+│   ├── Ollama Integration Flow
+│   ├── Task Decomposition
+│   ├── Agent Lifecycle
+│   ├── Message Patterns
+│   └── Error Handling
+│
+└── NAVIGATION.md
+    ├── Navigation Guide
+    ├── Quick Reference
+    ├── Use Case Scenarios
+    └── Documentation Matrix
 ```
 
 ## 🤝 Contributing
