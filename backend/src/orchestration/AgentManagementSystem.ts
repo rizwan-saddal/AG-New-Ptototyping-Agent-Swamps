@@ -15,6 +15,8 @@ import { QAAgent } from '../agents/QAAgent.js';
 import { ProductManagerAgent } from '../agents/ProductManagerAgent.js';
 import { SEOAgent } from '../agents/SEOAgent.js';
 import { LeadGenerationAgent } from '../agents/LeadGenerationAgent.js';
+import { AIMLAgent } from '../agents/AIMLAgent.js';
+import { MentorAgent } from '../agents/MentorAgent.js';
 
 export class AgentManagementSystem {
   private learningProfiles: Map<string, AgentLearningProfile> = new Map();
@@ -74,6 +76,30 @@ export class AgentManagementSystem {
       promptTemplate: 'You are an expert lead generation specialist. Your task is to {task}.',
       trainingStrategy: 'continuous'
     });
+
+    // AI/ML Expert Agent Template
+    this.agentTemplates.set('aiml-template', {
+      id: 'aiml-template',
+      name: 'AI/ML Expert Agent Template',
+      type: 'AI_ML' as AgentType,
+      description: 'Specialized in model selection, evaluation, and MLOps readiness',
+      defaultCapabilities: ['model-selection', 'evaluation-design', 'ml-observability', 'feature-engineering'],
+      defaultSpecializations: ['ai-ml', 'mlops', 'research'],
+      promptTemplate: 'You are an AI/ML expert. Design robust, evaluable solutions that follow open standards. Task: {task}.',
+      trainingStrategy: 'continuous'
+    });
+
+    // Mentor/Lead Agent Template
+    this.agentTemplates.set('mentor-template', {
+      id: 'mentor-template',
+      name: 'Mentor Lead Agent Template',
+      type: 'MENTOR' as AgentType,
+      description: 'Guides agents with mentorship, retrospectives, and continuous improvement plans',
+      defaultCapabilities: ['mentorship', 'retrospective', 'skill-mapping', 'feedback-loop'],
+      defaultSpecializations: ['leadership', 'coaching'],
+      promptTemplate: 'You are a lead mentor focused on skill growth and feedback loops. Task: {task}.',
+      trainingStrategy: 'continuous'
+    });
   }
 
   createAgent(request: AgentCreationRequest): Agent {
@@ -118,6 +144,14 @@ export class AgentManagementSystem {
           channels: request.customCapabilities,
           tactics: request.customSpecializations
         });
+        break;
+
+      case 'AI_ML' as AgentType:
+        agent = new AIMLAgent(this.modelRouter);
+        break;
+
+      case 'MENTOR' as AgentType:
+        agent = new MentorAgent(this.modelRouter);
         break;
       
       default:

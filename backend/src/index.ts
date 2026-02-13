@@ -9,8 +9,11 @@ import { QAAgent } from './agents/QAAgent.js';
 import { ProductManagerAgent } from './agents/ProductManagerAgent.js';
 import { SEOAgent } from './agents/SEOAgent.js';
 import { LeadGenerationAgent } from './agents/LeadGenerationAgent.js';
+import { AIMLAgent } from './agents/AIMLAgent.js';
+import { MentorAgent } from './agents/MentorAgent.js';
 import { AgentManagementSystem } from './orchestration/AgentManagementSystem.js';
 import { WorkflowManagementSystem } from './orchestration/WorkflowManagementSystem.js';
+import { ConnectorRegistry } from './orchestration/ConnectorRegistry.js';
 import { APIServer } from './api/APIServer.js';
 
 // Load environment variables
@@ -52,6 +55,11 @@ async function main() {
   console.log('  ✓ Workflow Management System ready');
   console.log(`  ✓ ${workflowManagement.listTemplates().length} predefined workflow templates loaded`);
 
+  // Initialize Connector Registry
+  console.log('\n🔌 Initializing Connector Registry (open standards)...');
+  const connectorRegistry = new ConnectorRegistry();
+  console.log(`  ✓ ${connectorRegistry.list().length} connectors available for canvas/automation`);
+
   // Register agents
   console.log('\n📦 Registering agents...');
   
@@ -85,10 +93,20 @@ async function main() {
   agentManagement.initializeLearningProfile(leadGenAgent.id, 'continuous');
   console.log('  ✓ Lead Generation Agent registered');
 
+  const aiMlAgent = new AIMLAgent(modelRouter);
+  registry.registerAgent(aiMlAgent);
+  agentManagement.initializeLearningProfile(aiMlAgent.id, 'continuous');
+  console.log('  ✓ AI/ML Expert Agent registered');
+
+  const mentorAgent = new MentorAgent(modelRouter);
+  registry.registerAgent(mentorAgent);
+  agentManagement.initializeLearningProfile(mentorAgent.id, 'continuous');
+  console.log('  ✓ Mentor Lead Agent registered');
+
   // Start API Server with management systems
   console.log('\n🌐 Starting API Server...');
   const port = parseInt(process.env.PORT || '3000', 10);
-  const apiServer = new APIServer(orchestrator, port, agentManagement, workflowManagement);
+  const apiServer = new APIServer(orchestrator, port, agentManagement, workflowManagement, connectorRegistry);
   apiServer.start();
 
   // Display system status

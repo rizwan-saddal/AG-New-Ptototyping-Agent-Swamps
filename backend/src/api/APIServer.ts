@@ -7,7 +7,7 @@ import cors from 'cors';
 import { Orchestrator } from '../orchestration/Orchestrator.js';
 import { AgentManagementSystem } from '../orchestration/AgentManagementSystem.js';
 import { WorkflowManagementSystem } from '../orchestration/WorkflowManagementSystem.js';
-import type { Agent } from '../agents/Agent.js';
+import { ConnectorRegistry } from '../orchestration/ConnectorRegistry.js';
 
 export class APIServer {
   private app: express.Application;
@@ -16,13 +16,15 @@ export class APIServer {
   private orchestrator: Orchestrator;
   private agentManagement?: AgentManagementSystem;
   private workflowManagement?: WorkflowManagementSystem;
+  private connectorRegistry?: ConnectorRegistry;
   private port: number;
 
   constructor(
     orchestrator: Orchestrator, 
     port: number = 3000,
     agentManagement?: AgentManagementSystem,
-    workflowManagement?: WorkflowManagementSystem
+    workflowManagement?: WorkflowManagementSystem,
+    connectorRegistry?: ConnectorRegistry
   ) {
     this.app = express();
     this.httpServer = createServer(this.app);
@@ -35,6 +37,7 @@ export class APIServer {
     this.orchestrator = orchestrator;
     this.agentManagement = agentManagement;
     this.workflowManagement = workflowManagement;
+    this.connectorRegistry = connectorRegistry;
     this.port = port;
 
     this.setupMiddleware();
@@ -85,9 +88,16 @@ export class APIServer {
     if (this.workflowManagement) {
       this.app.get('/api/workflows/templates', this.listWorkflowTemplates.bind(this));
       this.app.get('/api/workflows/templates/:id', this.getWorkflowTemplate.bind(this));
+      this.app.get('/api/workflows/templates/:id/canvas', this.getWorkflowCanvas.bind(this));
       this.app.post('/api/workflows/templates', this.createWorkflowTemplate.bind(this));
       this.app.post('/api/workflows/execute', this.executeWorkflow.bind(this));
       this.app.get('/api/workflows/executions/:id', this.getWorkflowStatus.bind(this));
+    }
+
+    // Connector endpoints (open standards)
+    if (this.connectorRegistry) {
+      this.app.get('/api/connectors', this.listConnectors.bind(this));
+      this.app.get('/api/connectors/:id', this.getConnector.bind(this));
     }
 
     // System endpoints
@@ -631,6 +641,91 @@ export class APIServer {
       res.json({
         success: true,
         workflow: status
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  private getWorkflowCanvas(req: Request, res: Response): void {
+    try {
+      if (!this.workflowManagement) {
+        res.status(503).json({
+          success: false,
+          error: 'Workflow management system not available'
+        });
+        return;
+      }
+
+      const canvas = this.workflowManagement.getWorkflowCanvas(req.params.id);
+
+      if (!canvas) {
+        res.status(404).json({
+          success: false,
+          error: 'Workflow template not found'
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        canvas
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  private listConnectors(_req: Request, res: Response): void {
+    try {
+      if (!this.connectorRegistry) {
+        res.status(503).json({
+          success: false,
+          error: 'Connector registry not available'
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        connectors: this.connectorRegistry.list()
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  private getConnector(req: Request, res: Response): void {
+    try {
+      if (!this.connectorRegistry) {
+        res.status(503).json({
+          success: false,
+          error: 'Connector registry not available'
+        });
+        return;
+      }
+
+      const connector = this.connectorRegistry.get(req.params.id);
+      if (!connector) {
+        res.status(404).json({
+          success: false,
+          error: 'Connector not found'
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        connector
       });
     } catch (error) {
       res.status(500).json({

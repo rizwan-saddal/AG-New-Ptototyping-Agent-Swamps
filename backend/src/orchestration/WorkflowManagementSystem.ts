@@ -6,6 +6,7 @@ import type {
   WorkflowStep,
   WorkflowExecution,
   WorkflowStepExecution,
+  WorkflowCanvas,
   AgentType,
   TaskType
 } from '../shared/types.js';
@@ -213,6 +214,45 @@ export class WorkflowManagementSystem {
         }
       ]
     });
+
+    // Agent Skill Development Workflow
+    this.templates.set('skill-development', {
+      id: 'skill-development',
+      name: 'Agent Skill Development',
+      description: 'Continuous mentorship loop pairing a mentor lead with an AI/ML expert for capability growth',
+      category: 'operations',
+      requiredAgentTypes: ['MENTOR' as AgentType, 'AI_ML' as AgentType],
+      estimatedDuration: 1800000, // 30 minutes
+      steps: [
+        {
+          id: 'assessment',
+          name: 'Assess Strengths and Gaps',
+          agentType: 'MENTOR' as AgentType,
+          taskType: 'GENERAL' as TaskType,
+          dependencies: [],
+          inputs: { agentProfile: 'input' },
+          expectedOutputs: ['skill gaps', 'growth goals']
+        },
+        {
+          id: 'ml-plan',
+          name: 'Design AI/ML Practice Plan',
+          agentType: 'AI_ML' as AgentType,
+          taskType: 'RESEARCH' as TaskType,
+          dependencies: ['assessment'],
+          inputs: { goals: 'from_assessment' },
+          expectedOutputs: ['practice backlog', 'evaluation plan']
+        },
+        {
+          id: 'mentorship',
+          name: 'Mentorship and Review',
+          agentType: 'MENTOR' as AgentType,
+          taskType: 'GENERAL' as TaskType,
+          dependencies: ['ml-plan'],
+          inputs: { plan: 'from_ml-plan' },
+          expectedOutputs: ['feedback log', 'updated learning profile']
+        }
+      ]
+    });
   }
 
   async executeWorkflow(templateId: string, initialInputs: Record<string, any>): Promise<string> {
@@ -352,6 +392,41 @@ export class WorkflowManagementSystem {
 
   getTemplate(templateId: string): WorkflowTemplate | undefined {
     return this.templates.get(templateId);
+  }
+
+  getWorkflowCanvas(templateId: string): WorkflowCanvas | undefined {
+    const template = this.templates.get(templateId);
+    if (!template) {
+      return undefined;
+    }
+
+    const nodes = template.steps.map(step => ({
+      id: step.id,
+      label: step.name,
+      agentType: step.agentType,
+      taskType: step.taskType,
+      expectedOutputs: step.expectedOutputs
+    }));
+
+    const edges = template.steps.flatMap(step =>
+      step.dependencies.map(dep => ({
+        from: dep,
+        to: step.id,
+        label: 'depends_on'
+      }))
+    );
+
+    return {
+      templateId: template.id,
+      name: template.name,
+      category: template.category,
+      nodes,
+      edges,
+      metadata: {
+        standard: 'BPMN 2.0 compatible',
+        requiredAgentTypes: template.requiredAgentTypes
+      }
+    };
   }
 
   addCustomTemplate(template: WorkflowTemplate): void {
