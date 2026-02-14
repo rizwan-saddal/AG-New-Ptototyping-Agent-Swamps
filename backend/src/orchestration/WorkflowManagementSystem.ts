@@ -241,7 +241,8 @@ export class WorkflowManagementSystem {
     // Start executing workflow asynchronously
     this.executeWorkflowSteps(execution, template).catch(error => {
       execution.status = 'failed';
-      execution.results.error = error.message;
+      execution.completedAt = new Date();
+      execution.results.error = error instanceof Error ? error.message : 'Unknown error';
     });
 
     return executionId;
@@ -250,25 +251,46 @@ export class WorkflowManagementSystem {
   private async executeWorkflowSteps(execution: WorkflowExecution, template: WorkflowTemplate): Promise<void> {
     execution.status = 'running';
 
-    for (let i = 0; i < template.steps.length; i++) {
-      const step = template.steps[i];
-      const stepExecution = execution.steps[i];
+    try {
+      for (let i = 0; i < template.steps.length; i++) {
+        const step = template.steps[i];
+        const stepExecution = execution.steps[i];
+        execution.currentStep = i;
 
-      // Check dependencies
-      const dependenciesMet = await this.checkDependencies(step, execution);
-      
-      if (!dependenciesMet) {
-        throw new Error(`Dependencies not met for step ${step.id}`);
+        const result = await this.runStepWithRetry(step, execution, stepExecution, 2);
+        stepExecution.status = 'completed';
+        stepExecution.result = result;
+        execution.results[step.id] = result;
       }
 
-      stepExecution.status = 'running';
-      execution.currentStep = i;
+      execution.status = 'completed';
+      execution.completedAt = new Date();
+    } catch (error) {
+      execution.status = 'failed';
+      execution.completedAt = new Date();
+      execution.results.error = error instanceof Error ? error.message : 'Unknown error';
+      throw error;
+    }
+  }
 
+  private async runStepWithRetry(
+    step: WorkflowStep,
+    execution: WorkflowExecution,
+    stepExecution: WorkflowStepExecution,
+    maxAttempts: number
+  ): Promise<any> {
+    let lastError: unknown;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        // Prepare inputs from previous steps
-        const inputs = this.prepareStepInputs(step, execution);
+        const dependenciesMet = await this.checkDependencies(step, execution);
+        if (!dependenciesMet) {
+          throw new Error(`Dependencies not met for step ${step.id}`);
+        }
 
-        // Submit task to orchestrator
+        stepExecution.status = 'running';
+
+        const inputs = this.prepareStepInputs(step, execution);
         const taskId = await this.orchestrator.submitTask({
           title: step.name,
           description: `${step.name}: ${JSON.stringify(inputs)}`,
@@ -280,27 +302,28 @@ export class WorkflowManagementSystem {
         stepExecution.taskId = taskId;
         stepExecution.assignedAgentId = 'auto-assigned';
 
-        // Wait for task completion
-        const result = await this.orchestrator.waitForTask(taskId, 300000); // 5 min timeout
+        const result = await this.orchestrator.waitForTask(taskId, 300000);
 
         if (result.success) {
-          stepExecution.status = 'completed';
-          stepExecution.result = result.result;
-          execution.results[step.id] = result.result;
-        } else {
-          stepExecution.status = 'failed';
-          stepExecution.error = result.error;
-          throw new Error(`Step ${step.id} failed: ${result.error}`);
+          return result.result;
         }
+
+        throw new Error(`Step ${step.id} failed: ${result.error}`);
       } catch (error) {
+        lastError = error;
         stepExecution.status = 'failed';
         stepExecution.error = error instanceof Error ? error.message : 'Unknown error';
-        throw error;
+
+        if (attempt < maxAttempts) {
+          await this.delay(1000);
+          stepExecution.error = undefined;
+          stepExecution.status = 'pending';
+          continue;
+        }
       }
     }
 
-    execution.status = 'completed';
-    execution.completedAt = new Date();
+    throw lastError instanceof Error ? lastError : new Error('Workflow step failed');
   }
 
   private async checkDependencies(step: WorkflowStep, execution: WorkflowExecution): Promise<boolean> {
@@ -334,6 +357,10 @@ export class WorkflowManagementSystem {
     }
 
     return inputs;
+  }
+
+  private async delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   getWorkflowExecution(executionId: string): WorkflowExecution | undefined {

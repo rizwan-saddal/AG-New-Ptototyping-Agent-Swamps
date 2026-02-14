@@ -145,14 +145,17 @@ export class AgentManagementSystem {
   }
 
   initializeLearningProfile(agentId: string, strategy: 'supervised' | 'reinforced' | 'continuous' = 'continuous'): void {
+    const baseLearningRate = strategy === 'reinforced' ? 0.08 : strategy === 'supervised' ? 0.1 : 0.12;
+
     this.learningProfiles.set(agentId, {
       agentId,
       trainingHistory: [],
       strengthAreas: [],
       improvementAreas: [],
       preferredTaskTypes: [],
-      learningRate: 0.1,
-      lastTrainingDate: new Date()
+      learningRate: baseLearningRate,
+      lastTrainingDate: new Date(),
+      learningStrategy: strategy
     });
   }
 
@@ -248,7 +251,7 @@ export class AgentManagementSystem {
 
         // Process batch
         for (const data of batch) {
-          const reward = config.rewardFunction(data.output, data.input);
+          const reward = this.calculateReward(config.rewardConfig, data);
           
           // Update agent's learning based on reward
           // This is a simplified version - real RL would involve model updates
@@ -265,6 +268,18 @@ export class AgentManagementSystem {
 
     profile.lastTrainingDate = new Date();
     console.log(`Reinforcement training completed for agent ${config.agentId}`);
+  }
+
+  private calculateReward(config: ReinforcementTrainingConfig['rewardConfig'], data: AgentTrainingData): number {
+    if (config.strategy === 'feedback_bonus') {
+      const base = data.success ? 0.7 : 0.2;
+      const feedbackWeight = config.feedbackWeight ?? 0.3;
+      return Math.min(1, base + (data.feedback ? feedbackWeight : 0));
+    }
+
+    // success_rate strategy
+    const successWeight = config.successWeight ?? 1;
+    return data.success ? successWeight : 0;
   }
 
   getLearningProfile(agentId: string): AgentLearningProfile | undefined {

@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { AgentRegistry } from './AgentRegistry.js';
 import { AgentSelector } from './AgentSelector.js';
 import { TaskQueue } from './TaskQueue.js';
+import { EventEmitter } from 'events';
 import type { Task, TaskResult, TaskType, TaskPriority, TaskStatus } from '../shared/types.js';
 
 interface TaskRequest {
@@ -21,11 +22,13 @@ export class Orchestrator {
   private taskQueue: TaskQueue;
   private processing: boolean = false;
   private taskResults: Map<string, TaskResult> = new Map();
+  private taskEvents: EventEmitter;
 
   constructor() {
     this.agentRegistry = new AgentRegistry();
     this.agentSelector = new AgentSelector(this.agentRegistry);
     this.taskQueue = new TaskQueue();
+    this.taskEvents = new EventEmitter();
   }
 
   getRegistry(): AgentRegistry {
@@ -114,6 +117,7 @@ export class Orchestrator {
 
       // Store result
       this.taskResults.set(task.id, result);
+      this.taskEvents.emit('task:completed', task.id, result);
 
       // Update task status
       if (result.success) {
@@ -173,18 +177,29 @@ export class Orchestrator {
   }
 
   async waitForTask(taskId: string, timeout: number = 30000): Promise<TaskResult> {
-    const startTime = Date.now();
-    
-    while (Date.now() - startTime < timeout) {
-      const result = this.taskResults.get(taskId);
-      if (result) {
-        return result;
-      }
-      
-      await this.delay(500);
-    }
+    const existing = this.taskResults.get(taskId);
+    if (existing) return existing;
 
-    throw new Error(`Task ${taskId} timeout`);
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        cleanup();
+        reject(new Error(`Task ${taskId} timeout`));
+      }, timeout);
+
+      const onComplete = (completedId: string, result: TaskResult) => {
+        if (completedId === taskId) {
+          cleanup();
+          resolve(result);
+        }
+      };
+
+      const cleanup = () => {
+        clearTimeout(timer);
+        this.taskEvents.off('task:completed', onComplete);
+      };
+
+      this.taskEvents.on('task:completed', onComplete);
+    });
   }
 
   private delay(ms: number): Promise<void> {

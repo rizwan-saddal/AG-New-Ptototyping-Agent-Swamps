@@ -2,7 +2,6 @@
 
 import { Orchestrator } from './orchestration/Orchestrator.js';
 import { ModelRouter } from './models/ModelRouter.js';
-import { GeminiProvider } from './models/GeminiProvider.js';
 import { DeveloperAgent } from './agents/DeveloperAgent.js';
 import { QAAgent } from './agents/QAAgent.js';
 import { ProductManagerAgent } from './agents/ProductManagerAgent.js';

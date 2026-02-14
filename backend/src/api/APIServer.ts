@@ -1,13 +1,89 @@
 // API Server with REST and WebSocket support
 
-import express, { type Request, type Response } from 'express';
+import express, { type NextFunction, type Request, type Response } from 'express';
 import { Server as SocketIOServer } from 'socket.io';
 import { createServer } from 'http';
 import cors from 'cors';
+import { z } from 'zod';
 import { Orchestrator } from '../orchestration/Orchestrator.js';
 import { AgentManagementSystem } from '../orchestration/AgentManagementSystem.js';
 import { WorkflowManagementSystem } from '../orchestration/WorkflowManagementSystem.js';
-import type { Agent } from '../agents/Agent.js';
+import { AgentType, TaskPriority, TaskType } from '../shared/types.js';
+
+const taskRequestSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().min(1),
+  type: z.nativeEnum(TaskType).default(TaskType.GENERAL),
+  priority: z.nativeEnum(TaskPriority).default(TaskPriority.MEDIUM),
+  requiredCapabilities: z.array(z.string()).optional(),
+  context: z.record(z.any()).optional()
+});
+
+const agentCreateSchema = z.object({
+  name: z.string().min(1),
+  type: z.nativeEnum(AgentType),
+  templateId: z.string().optional(),
+  customCapabilities: z.array(z.string()).optional(),
+  customSpecializations: z.array(z.string()).optional(),
+  trainingStrategy: z.enum(['supervised', 'reinforced', 'continuous']).optional(),
+  initialTrainingData: z.array(
+    z.object({
+      taskId: z.string(),
+      input: z.string(),
+      output: z.string(),
+      success: z.boolean(),
+      feedback: z.string().optional(),
+      timestamp: z.coerce.date()
+    })
+  ).optional()
+});
+
+const trainingSchema = z.object({
+  trainingData: z.array(
+    z.object({
+      taskId: z.string(),
+      input: z.string(),
+      output: z.string(),
+      success: z.boolean(),
+      feedback: z.string().optional(),
+      timestamp: z.coerce.date()
+    })
+  ).min(1)
+});
+
+const agentTemplateSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  type: z.nativeEnum(AgentType),
+  description: z.string().min(1),
+  defaultCapabilities: z.array(z.string()),
+  defaultSpecializations: z.array(z.string()),
+  promptTemplate: z.string().min(1),
+  trainingStrategy: z.enum(['supervised', 'reinforced', 'continuous']).optional()
+});
+
+const workflowTemplateSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().min(1),
+  steps: z.array(z.object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    agentType: z.nativeEnum(AgentType),
+    taskType: z.nativeEnum(TaskType),
+    dependencies: z.array(z.string()),
+    inputs: z.record(z.any()),
+    expectedOutputs: z.array(z.string())
+  })),
+  requiredAgentTypes: z.array(z.nativeEnum(AgentType)),
+  estimatedDuration: z.number().optional(),
+  category: z.enum(['development', 'marketing', 'operations', 'custom'])
+});
+
+const workflowExecuteSchema = z.object({
+  templateId: z.string().min(1),
+  inputs: z.record(z.any()).default({})
+});
 
 export class APIServer {
   private app: express.Application;
@@ -17,6 +93,7 @@ export class APIServer {
   private agentManagement?: AgentManagementSystem;
   private workflowManagement?: WorkflowManagementSystem;
   private port: number;
+  private apiKey?: string;
 
   constructor(
     orchestrator: Orchestrator, 
@@ -36,6 +113,7 @@ export class APIServer {
     this.agentManagement = agentManagement;
     this.workflowManagement = workflowManagement;
     this.port = port;
+    this.apiKey = process.env.API_KEY;
 
     this.setupMiddleware();
     this.setupRoutes();
@@ -48,15 +126,18 @@ export class APIServer {
     this.app.use(express.urlencoded({ extended: true }));
 
     // Logging middleware
-    this.app.use((req, res, next) => {
+    this.app.use((req, _res, next) => {
       console.log(`${req.method} ${req.path}`);
       next();
     });
+
+    // Simple API key authentication for protected endpoints
+    this.app.use(this.authenticateRequest.bind(this));
   }
 
   private setupRoutes(): void {
     // Health check
-    this.app.get('/health', (req: Request, res: Response) => {
+    this.app.get('/health', (_req: Request, res: Response) => {
       res.json({ status: 'ok', timestamp: new Date().toISOString() });
     });
 
@@ -112,10 +193,42 @@ export class APIServer {
     });
   }
 
+  private authenticateRequest(req: Request, res: Response, next: NextFunction): void {
+    if (!this.apiKey || req.path === '/health') {
+      next();
+      return;
+    }
+
+    const provided = (req.headers['x-api-key'] as string | undefined) || (req.query.api_key as string | undefined);
+    if (provided === this.apiKey) {
+      next();
+      return;
+    }
+
+    res.status(401).json({
+      success: false,
+      error: 'Unauthorized'
+    });
+  }
+
+  private validateRequest<T>(schema: z.ZodSchema<T>, payload: unknown, res: Response): T | undefined {
+    const parsed = schema.safeParse(payload);
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid request payload',
+        details: parsed.error.flatten()
+      });
+      return undefined;
+    }
+    return parsed.data;
+  }
+
   // Task handlers
   private async createTask(req: Request, res: Response): Promise<void> {
     try {
-      const taskRequest = req.body;
+      const taskRequest = this.validateRequest(taskRequestSchema, req.body, res);
+      if (!taskRequest) return;
       const taskId = await this.orchestrator.submitTask(taskRequest);
 
       // Emit task created event
@@ -137,7 +250,7 @@ export class APIServer {
     }
   }
 
-  private listTasks(req: Request, res: Response): void {
+  private listTasks(_req: Request, res: Response): void {
     try {
       const queue = this.orchestrator.getQueue();
       const pending = queue.getPendingTasks();
@@ -215,7 +328,7 @@ export class APIServer {
   }
 
   // Agent handlers
-  private listAgents(req: Request, res: Response): void {
+  private listAgents(_req: Request, res: Response): void {
     try {
       const registry = this.orchestrator.getRegistry();
       const agents = registry.getAllAgents();
@@ -303,7 +416,7 @@ export class APIServer {
     }
   }
 
-  private getSystemStats(req: Request, res: Response): void {
+  private getSystemStats(_req: Request, res: Response): void {
     try {
       const stats = this.orchestrator.getSystemStats();
 
@@ -330,7 +443,9 @@ export class APIServer {
         return;
       }
 
-      const agentRequest = req.body;
+      const agentRequest = this.validateRequest(agentCreateSchema, req.body, res);
+      if (!agentRequest) return;
+
       const agent = this.agentManagement.createAgent(agentRequest);
 
       // Register with orchestrator
@@ -364,9 +479,10 @@ export class APIServer {
       }
 
       const agentId = req.params.id;
-      const { trainingData } = req.body;
+      const body = this.validateRequest(trainingSchema, req.body, res);
+      if (!body) return;
 
-      this.agentManagement.trainAgent(agentId, trainingData);
+      this.agentManagement.trainAgent(agentId, body.trainingData);
 
       res.json({
         success: true,
@@ -446,7 +562,7 @@ export class APIServer {
     }
   }
 
-  private listAgentTemplates(req: Request, res: Response): void {
+  private listAgentTemplates(_req: Request, res: Response): void {
     try {
       if (!this.agentManagement) {
         res.status(503).json({
@@ -481,7 +597,9 @@ export class APIServer {
         return;
       }
 
-      const template = req.body;
+      const template = this.validateRequest(agentTemplateSchema, req.body, res);
+      if (!template) return;
+
       this.agentManagement.addCustomTemplate(template);
 
       res.json({
@@ -507,8 +625,8 @@ export class APIServer {
         return;
       }
 
-      const category = req.query.category as any;
-      const templates = this.workflowManagement.listTemplates(category);
+      const categoryParam = typeof req.query.category === 'string' ? req.query.category : undefined;
+      const templates = this.workflowManagement.listTemplates(categoryParam as any);
 
       res.json({
         success: true,
@@ -566,7 +684,9 @@ export class APIServer {
         return;
       }
 
-      const template = req.body;
+      const template = this.validateRequest(workflowTemplateSchema, req.body, res);
+      if (!template) return;
+
       this.workflowManagement.addCustomTemplate(template);
 
       res.json({
@@ -591,7 +711,11 @@ export class APIServer {
         return;
       }
 
-      const { templateId, inputs } = req.body;
+      const payload = this.validateRequest(workflowExecuteSchema, req.body, res);
+      if (!payload) return;
+
+      const { templateId } = payload;
+      const inputs = payload.inputs ?? {};
       const executionId = await this.workflowManagement.executeWorkflow(templateId, inputs);
 
       res.json({

@@ -40,6 +40,7 @@ export class QAAgent extends Agent {
 Analyze this testing task:
 Title: ${task.title}
 Description: ${task.description}
+Available frameworks: ${this.testingFrameworks.join(', ')}
 
 Determine:
 1. Type of testing needed (unit, integration, e2e)
