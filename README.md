@@ -2,7 +2,7 @@
 
 ## 📋 Overview
 
-Agent Swamps is a **zero-touch agentic software house** - an autonomous multi-agent system that orchestrates specialized AI agents to automate complete software development workflows. The system leverages local LLMs (via Ollama) to provide intelligent, collaborative agents that can design, develop, test, and deploy software with minimal human intervention.
+Agent Swamps is a **zero-touch agentic software house** - an autonomous multi-agent system that orchestrates specialized AI agents to automate complete software development workflows. The current implementation uses a **Fluent UI 2 React frontend** and a **Microsoft .NET agent/workflow backend** based on Semantic Kernel.
 
 ## 🎯 Vision
 
@@ -152,10 +152,8 @@ Guide to navigating all documentation.
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- Ollama installed
-- PostgreSQL (optional for persistence)
-- Redis (optional for caching)
+- Node.js 20+ (frontend)
+- .NET SDK 8.0+ (agent backend)
 
 ### Installation
 
@@ -176,18 +174,17 @@ ollama pull codellama:13b
 ollama pull nomic-embed-text
 ```
 
-3. **Setup Frontend**
+3. **Setup Frontend (Fluent UI 2)**
 ```bash
 cd temp_app
 npm install
 npm run dev
 ```
 
-4. **Setup Backend** (Coming soon)
+4. **Setup Backend (.NET Agent Framework)**
 ```bash
-cd backend
-npm install
-npm run dev
+cd backend-dotnet
+dotnet run
 ```
 
 ### Configuration

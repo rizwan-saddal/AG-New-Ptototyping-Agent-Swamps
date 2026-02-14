@@ -16,3 +16,5 @@ yarn-error.log*
 .cache/
 coverage/
 .nyc_output/
+bin/
+obj/

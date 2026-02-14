@@ -1,34 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Badge, Button, Card, CardHeader, ProgressBar, Text, Title1 } from '@fluentui/react-components'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <main className="app-shell">
+      <Card className="panel">
+        <CardHeader
+          header={<Title1>Agent Swamps Command Dashboard</Title1>}
+          description={<Text>Fluent UI 2 frontend ready for Cloud Run deployment.</Text>}
+        />
+        <div className="status-row">
+          <Badge appearance="filled" color="brand">
+            Frontend: Fluent UI 2
+          </Badge>
+          <Badge appearance="filled" color="success">
+            Backend: .NET Agent Service
+          </Badge>
+        </div>
+        <div className="workflow-row">
+          <Text>Workflow initialization</Text>
+          <ProgressBar value={0.72} thickness="large" />
+        </div>
+        <div className="actions-row">
+          <Button appearance="primary">Open Neural Link</Button>
+          <Button appearance="secondary">Launch Workflow</Button>
+        </div>
+      </Card>
+    </main>
   )
 }
 

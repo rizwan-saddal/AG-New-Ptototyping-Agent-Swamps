@@ -2,6 +2,8 @@
 
 This guide covers deployment options for the Agent Swamps multi-agent system.
 
+> Current baseline stack: **Fluent UI 2 React frontend (`temp_app`)** + **.NET 8 Microsoft Semantic Kernel backend (`backend-dotnet`)**.
+
 ## Prerequisites
 
 - Node.js 18+ installed
@@ -59,6 +61,23 @@ curl http://localhost:3000/api/agents
 ```
 
 ## Production Deployment
+
+### Option 0: GCP Cloud Run (Recommended)
+
+The repository includes:
+- `backend-dotnet/Dockerfile`
+- `temp_app/Dockerfile`
+- `cloudbuild.yaml` (build and deploy both services)
+
+Deploy both services from Cloud Build:
+
+```bash
+gcloud builds submit --config cloudbuild.yaml --substitutions=_REGION=us-central1
+```
+
+This produces two Cloud Run services:
+- `agent-swamps-backend` (port 8080)
+- `agent-swamps-frontend` (port 80)
 
 ### Option 1: Node.js Production Server
 
