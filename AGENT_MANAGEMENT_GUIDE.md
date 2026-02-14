@@ -37,6 +37,33 @@ Specializes in lead generation strategies and conversion optimization.
 - `optimizeFunnel()` - Analyze and optimize conversion funnels
 - `generateLeadMagnet()` - Create compelling lead magnets
 
+### 3. AI/ML Expert Agent
+Specializes in model selection, evaluation design, and MLOps readiness.
+
+**Capabilities:**
+- Model selection and benchmarking
+- Data contracts via JSON Schema
+- Evaluation planning with clear metrics
+- MLOps hooks (registry, monitoring, drift)
+- Connector-aware planning (OpenAPI/BPMN nodes)
+
+**Methods:**
+- `designMLPlan()` - Create end-to-end ML plan with standards-based connectors
+- `reviewDatasetContract()` - Validate dataset schema and readiness
+
+### 4. Mentor Lead Agent
+Dedicated to continuous skill development and feedback loops.
+
+**Capabilities:**
+- Skill gap assessment and pairing plans
+- Mentorship feedback loops
+- Retrospectives and growth metrics
+- Learning profile updates
+
+**Methods:**
+- `createMentorshipPlan()` - Build measurable growth and review cadence
+- `updateLearningProfile()` - Push feedback into agent learning profiles
+
 ## 🎓 Agent Management System
 
 ### Continuous Learning
@@ -159,6 +186,15 @@ GET /api/agents/:id/insights
 
 **Use Case:** Complete product launch with development and marketing
 
+#### 5. Agent Skill Development
+**Steps:** Assessment → ML Practice Plan → Mentorship Review
+
+**Agents:** Mentor Lead → AI/ML Expert → Mentor Lead
+
+**Use Case:** Continuous skill development with measurable feedback loops
+
+**Canvas/Connectors:** Export a BPMN-compatible canvas via `/api/workflows/templates/skill-development/canvas`; use OpenAPI/JSON Schema connectors from `/api/connectors` for triggers and data contracts.
+
 ### Execute Workflows
 
 ```bash
@@ -246,9 +282,17 @@ POST   /api/agent-templates            - Add custom template
 ```
 GET    /api/workflows/templates             - List workflow templates
 GET    /api/workflows/templates/:id         - Get template details
+GET    /api/workflows/templates/:id/canvas  - Get BPMN-compatible canvas nodes/edges
 POST   /api/workflows/templates             - Create custom template
 POST   /api/workflows/execute               - Execute a workflow
 GET    /api/workflows/executions/:id        - Get execution status
+```
+
+### Connectors & Canvas
+
+```
+GET    /api/connectors          - List OpenAPI/JSON Schema/BPMN connectors
+GET    /api/connectors/:id      - Get a specific connector definition
 ```
 
 ## 🎯 Use Cases

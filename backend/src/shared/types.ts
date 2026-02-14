@@ -10,7 +10,9 @@ export enum AgentType {
   TECH_WRITER = 'TECH_WRITER',
   RESEARCH = 'RESEARCH',
   SEO = 'SEO',
-  LEAD_GENERATION = 'LEAD_GENERATION'
+  LEAD_GENERATION = 'LEAD_GENERATION',
+  AI_ML = 'AI_ML',
+  MENTOR = 'MENTOR'
 }
 
 export enum AgentStatus {
@@ -261,4 +263,39 @@ export interface AgentCreationRequest {
   customSpecializations?: string[];
   trainingStrategy?: 'supervised' | 'reinforced' | 'continuous';
   initialTrainingData?: AgentTrainingData[];
+}
+
+// Connector definitions follow open standards (OpenAPI/JSON Schema/BPMN)
+export interface ConnectorDefinition {
+  id: string;
+  name: string;
+  description: string;
+  standard: 'openapi' | 'jsonschema' | 'bpmn';
+  schemaRef?: string;
+  inputs: Record<string, any>;
+  outputs: Record<string, any>;
+  auth: {
+    type: 'none' | 'apiKey' | 'oauth2';
+    description?: string;
+  };
+  example?: Record<string, any>;
+}
+
+export interface WorkflowCanvas {
+  templateId: string;
+  name: string;
+  category: WorkflowTemplate['category'];
+  nodes: Array<{
+    id: string;
+    label: string;
+    agentType: AgentType;
+    taskType: TaskType;
+    expectedOutputs: string[];
+  }>;
+  edges: Array<{
+    from: string;
+    to: string;
+    label?: string;
+  }>;
+  metadata?: Record<string, any>;
 }

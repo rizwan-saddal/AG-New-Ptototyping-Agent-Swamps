@@ -62,6 +62,12 @@ Agent Swamps is a comprehensive multi-agent orchestration system that leverages 
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+## Open Standards & Connector Canvas
+
+- **Connectors:** All integrations are defined as OpenAPI/JSON Schema/BPMN connectors (no proprietary formats) and are discoverable via the Connector Registry.
+- **Workflow Canvas:** Workflow templates export canvas-friendly nodes/edges compatible with BPMN 2.0 for drag-and-drop builders (crewAI/n8n style).
+- **Data Contracts:** Dataset and event contracts rely on JSON Schema to ensure repeatable AI/ML workflows and safe automation.
+
 ## Core Components
 
 ### 1. Orchestration Engine

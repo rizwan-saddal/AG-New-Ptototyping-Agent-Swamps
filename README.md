@@ -15,6 +15,7 @@ Agent Swamps is a **complete agent management platform** that goes beyond simple
 - **🧠 Open Model Integration**: Model-agnostic design supporting Google Gemini, OpenAI, Anthropic, and local models
 - **🔄 Real-time Orchestration**: Dynamic task distribution and agent coordination
 - **📊 Performance Analytics**: Detailed insights into agent strengths, improvements, and learning progress
+- **🔌 Open Standards & Connectors**: OpenAPI/JSON Schema connectors and BPMN-compatible workflow canvas for crewAI/n8n-style automation
 - **🌐 Complete API**: REST and WebSocket APIs for all management and orchestration features
 
 ## 🆕 Agent Management System
@@ -60,8 +61,9 @@ The system is built on a layered architecture:
 └─────────────────────────────────────────┘
                   ↕
 ┌─────────────────────────────────────────┐
-│         Agent Layer (5 Types)           │
+│         Agent Layer (7 Types)           │
 │  Developer | QA | PM | SEO | Lead Gen   │
+│  AI/ML Expert | Mentor Lead             │
 │  All with continuous learning           │
 └─────────────────────────────────────────┘
                   ↕
@@ -70,6 +72,12 @@ The system is built on a layered architecture:
 │  Gemini | OpenAI | Claude | Local LLMs  │
 └─────────────────────────────────────────┘
 ```
+
+## 🔌 Connectors & Workflow Canvas
+
+- OpenAPI/JSON Schema connectors for triggers and data contracts exposed at `/api/connectors` and `/api/connectors/:id`.
+- BPMN-compatible workflow canvas export at `/api/workflows/templates/:id/canvas` for n8n/crewAI-style UI builders.
+- Designed to stay on open standards (no proprietary formats) while enabling end-user drag-and-drop automation.
 
 ## 📚 Documentation
 
@@ -282,6 +290,18 @@ This ensures:
    - Landing page optimization
    - Lead scoring and segmentation
    - Multi-channel campaigns
+
+6. **AI/ML Expert Agent** 🧠 *(NEW)*
+   - Model selection and evaluation design
+   - Data contracts via JSON Schema
+   - MLOps readiness with monitoring hooks
+   - Connector-aware plans (OpenAPI webhooks, BPMN nodes)
+
+7. **Mentor Lead Agent** 🎯 *(NEW)*
+   - Coaching and retrospectives
+   - Skill gap assessment and pairing plans
+   - Feedback loops that update learning profiles
+   - Supports continuous improvement workflows
 
 ### Agent Capabilities
 
