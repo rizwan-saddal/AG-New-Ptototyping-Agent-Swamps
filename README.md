@@ -1,405 +1,359 @@
-# Agent Swamps - AI Agent Management & Orchestration Platform
+# Agent Swamps - Architecture & Documentation
 
-> A comprehensive AI agent management system with training, fine-tuning, workflow automation, and intelligent orchestration powered by open AI models.
+## 📋 Overview
 
-## 🌟 Overview
+Agent Swamps is a **zero-touch agentic software house** - an autonomous multi-agent system that orchestrates specialized AI agents to automate complete software development workflows. The system leverages local LLMs (via Ollama) to provide intelligent, collaborative agents that can design, develop, test, and deploy software with minimal human intervention.
 
-Agent Swamps is a **complete agent management platform** that goes beyond simple orchestration. Create, train, fine-tune, and automate multi-agent workflows for software development, marketing, operations, and more. The system uses open models (like Google Gemini) with continuous learning capabilities and behavior-based agent selection.
+## 🎯 Vision
 
-### Key Features
+Create a "living" software development environment where AI agents work together like a real software team:
+- **Developer Agents** write production-ready code
+- **QA Agents** generate and execute comprehensive tests
+- **DevOps Agents** handle deployment and infrastructure
+- **Product Manager Agents** analyze requirements and prioritize features
+- **Architect Agents** design scalable system architectures
 
-- **🎓 Agent Training & Learning**: Continuous learning from task execution with reinforcement training support
-- **🤖 Agent Creation**: Create specialized agents from templates or build custom agents
-- **⚙️ Workflow Automation**: Predefined workflows for common organizational processes
-- **🎯 Intelligent Selection**: Behavior-based routing using performance metrics and specialization matching
-- **🧠 Open Model Integration**: Model-agnostic design supporting Google Gemini, OpenAI, Anthropic, and local models
-- **🔄 Real-time Orchestration**: Dynamic task distribution and agent coordination
-- **📊 Performance Analytics**: Detailed insights into agent strengths, improvements, and learning progress
-- **🔌 Open Standards & Connectors**: OpenAPI/JSON Schema connectors and BPMN-compatible workflow canvas for crewAI/n8n-style automation
-- **🌐 Complete API**: REST and WebSocket APIs for all management and orchestration features
+## 📚 Documentation Structure
 
-## 🆕 Agent Management System
+This repository contains comprehensive architectural documentation:
 
-### Training & Fine-Tuning
-- **Continuous Learning**: All agents learn from every task they execute
-- **Reinforcement Learning**: Custom reward functions for specialized training
-- **Adaptive Learning Rates**: Automatically adjust based on performance
-- **Learning Profiles**: Track strengths, improvements, and preferred task types
+### 1. [Framework Definition](./FRAMEWORK_DEFINITION.md)
+Complete framework architecture, principles, and technology stack.
+- **Core Principles**: Agent autonomy, collaborative intelligence, observability
+- **Technology Stack**: React, Node.js, Ollama, PostgreSQL, Redis
+- **Component Structure**: Frontend, Backend, Agent, and AI/ML layers
+- **Communication Protocols**: Message formats and task structures
+- **Security & Performance**: Best practices and optimization strategies
 
-### Agent Creation
-- **Template-Based**: Create agents from predefined templates
-- **Custom Capabilities**: Define specialized skills and focus areas
-- **Training Strategies**: Choose between supervised, reinforced, or continuous learning
+### 2. [Low-Level Architecture](./ARCHITECTURE.md)
+Detailed system architecture with diagrams and specifications.
+- **System Layers**: Complete layer-by-layer breakdown
+- **Component Architecture**: Frontend, Backend, Agent, and Ollama integration
+- **Data Flow Diagrams**: Task execution, agent communication, real-time updates
+- **Database Schema**: Complete data model with relationships
+- **API Specification**: REST endpoints and WebSocket protocols
+- **Deployment Architecture**: Development and production environments
+- **Performance Specs**: Response times, scalability targets, resource requirements
 
-### Workflow Automation
-- **4 Predefined Workflows**: Software Development, Marketing Campaign, Website Launch, Product Launch
-- **Custom Workflows**: Build multi-step automated processes
-- **Dependency Management**: Handle complex workflows with step dependencies
-- **Progress Tracking**: Monitor workflow execution in real-time
+### 3. [Class Diagrams](./CLASS_DIAGRAMS.md)
+Complete class structure for all system components.
+- **Frontend Classes**: Components, contexts, and services
+- **Backend Classes**: Core services, orchestrator, task manager
+- **Agent Classes**: Base agent, specialized agents, and tools
+- **Ollama Integration**: Client, model manager, prompt builder
+- **Data Models**: Task, Agent, Message, Artifact structures
+- **Interfaces & Enums**: Type definitions and contracts
 
-## 🏗️ Architecture
+### 4. [Function Calling & APIs](./FUNCTION_CALLING.md)
+Comprehensive function and API documentation.
+- **Frontend API Calls**: Task and agent management functions
+- **Backend Endpoints**: Complete REST API specification
+- **Inter-Agent Communication**: Message patterns and protocols
+- **Ollama Integration**: AI/ML function calls
+- **WebSocket Protocol**: Real-time communication
+- **Internal Functions**: Orchestrator, task manager, state manager
 
-The system is built on a layered architecture:
+### 5. [Ollama Integration Plan](./OLLAMA_INTEGRATION.md)
+Complete guide for local LLM integration.
+- **What is Ollama**: Overview and capabilities
+- **Architecture Integration**: System diagrams and components
+- **Installation & Setup**: Step-by-step guide
+- **Model Selection**: Strategy by agent type and task
+- **Implementation**: Client, prompt builder, response parser
+- **Configuration**: Environment variables and agent configs
+- **Performance Optimization**: Pooling, caching, preloading
+- **Deployment**: Resource requirements and strategies
+
+### 6. [Implementation Plan](./implementation_plan.md)
+GUI implementation roadmap and phases.
+
+### 7. [System Workflows](./WORKFLOWS.md)
+Detailed workflow diagrams and process flows.
+- Complete system workflow
+- Agent collaboration patterns
+- Real-time update mechanisms
+- Ollama integration flow
+- Task decomposition process
+- Agent lifecycle management
+- Message flow patterns
+- Error handling strategies
+- Deployment workflow
+- Data persistence flow
+
+### 8. [Documentation Navigation](./NAVIGATION.md)
+Guide to navigating all documentation.
+- Navigation flowchart
+- Quick reference guide
+- Use case scenarios
+- Documentation matrix
+- Search guide
+- Diagram index
+
+## 🏗️ System Architecture (High-Level)
 
 ```
-┌─────────────────────────────────────────┐
-│      Frontend (React + TypeScript)      │
-│   Real-time Visualization & Management  │
-└─────────────────────────────────────────┘
-                  ↕
-┌─────────────────────────────────────────┐
-│         API Layer (REST + WS)           │
-│  Tasks | Agents | Training | Workflows  │
-└─────────────────────────────────────────┘
-                  ↕
-┌─────────────────────────────────────────┐
-│      Management & Orchestration         │
-│  - Agent Management System              │
-│  - Workflow Management System           │
-│  - Agent Selection & Routing            │
-│  - Performance Tracking & Learning      │
-└─────────────────────────────────────────┘
-                  ↕
-┌─────────────────────────────────────────┐
-│         Agent Layer (7 Types)           │
-│  Developer | QA | PM | SEO | Lead Gen   │
-│  AI/ML Expert | Mentor Lead             │
-│  All with continuous learning           │
-└─────────────────────────────────────────┘
-                  ↕
-┌─────────────────────────────────────────┐
-│      Open Model Engine                   │
-│  Gemini | OpenAI | Claude | Local LLMs  │
-└─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    React Frontend (UI)                       │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │ Swamp Canvas │  │   Dashboard  │  │  Neural Link │      │
+│  │ (Agent View) │  │   (Metrics)  │  │    (Chat)    │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+└─────────────────────────────────────────────────────────────┘
+                            ↕ WebSocket + REST API
+┌─────────────────────────────────────────────────────────────┐
+│                      Backend Services                        │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │ Orchestrator │  │ Task Manager │  │State Manager │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+│                   ┌──────────────┐                           │
+│                   │ Message Bus  │                           │
+│                   └──────────────┘                           │
+└─────────────────────────────────────────────────────────────┘
+                            ↕ Message Queue
+┌─────────────────────────────────────────────────────────────┐
+│                      Agent Layer                             │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │
+│  │Developer │ │    QA    │ │  DevOps  │ │    PM    │       │
+│  │  Agent   │ │  Agent   │ │  Agent   │ │  Agent   │       │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘       │
+└─────────────────────────────────────────────────────────────┘
+                            ↕ API Calls
+┌─────────────────────────────────────────────────────────────┐
+│                   Ollama (Local LLM)                         │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐                    │
+│  │ Llama 3  │ │CodeLlama │ │ Mistral  │                    │
+│  └──────────┘ └──────────┘ └──────────┘                    │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-## 🔌 Connectors & Workflow Canvas
+## 🔄 Workflow Example
 
-- OpenAPI/JSON Schema connectors for triggers and data contracts exposed at `/api/connectors` and `/api/connectors/:id`.
-- BPMN-compatible workflow canvas export at `/api/workflows/templates/:id/canvas` for n8n/crewAI-style UI builders.
-- Designed to stay on open standards (no proprietary formats) while enabling end-user drag-and-drop automation.
+### Creating a Feature
+```
+1. User: "Create a user authentication system"
+   └─> Command Dashboard receives request
 
-## 📚 Documentation
+2. System decomposes task:
+   ├─> Design authentication architecture (Architect Agent)
+   ├─> Implement login/register endpoints (Developer Agent)
+   ├─> Create UI components (Developer Agent)
+   ├─> Generate tests (QA Agent)
+   └─> Setup deployment (DevOps Agent)
 
-- **[AGENT_MANAGEMENT_GUIDE.md](./AGENT_MANAGEMENT_GUIDE.md)**: Complete guide to agent training, creation, and workflows
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)**: High-level system architecture and design principles
-- **[CLASS_DIAGRAMS.md](./CLASS_DIAGRAMS.md)**: Detailed class diagrams with relationships
-- **[LOW_LEVEL_DESIGN.md](./LOW_LEVEL_DESIGN.md)**: Implementation details, algorithms, and data structures
-- **[FLOW_DIAGRAMS.md](./FLOW_DIAGRAMS.md)**: System flow visualizations
-- **[DEPLOYMENT.md](./DEPLOYMENT.md)**: Production deployment guide
-- **[backend/README.md](./backend/README.md)**: Backend API documentation and usage
+3. Agents collaborate:
+   Developer ──request──> QA: "Generate tests for this code"
+   QA ──response──> Developer: "Here are the test cases"
+   Developer ──request──> DevOps: "Deploy to staging"
+
+4. Real-time updates:
+   └─> UI shows agent status, progress, and results
+```
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-
-- Node.js 18+ and npm
-- Google Gemini API key (or other supported AI provider)
+- Node.js 18+
+- Ollama installed
+- PostgreSQL (optional for persistence)
+- Redis (optional for caching)
 
 ### Installation
 
 1. **Clone the repository**
-
 ```bash
 git clone https://github.com/rizwan-saddal/AG-New-Ptototyping-Agent-Swamps.git
 cd AG-New-Ptototyping-Agent-Swamps
 ```
 
-2. **Setup Backend**
-
+2. **Install Ollama**
 ```bash
-cd backend
-npm install
+# macOS/Linux
+curl -fsSL https://ollama.com/install.sh | sh
 
-# Configure environment
-cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY
+# Pull required models
+ollama pull llama3
+ollama pull codellama:13b
+ollama pull nomic-embed-text
 ```
 
-3. **Setup Frontend** (optional, for UI)
-
-```bash
-cd ../temp_app
-npm install
-```
-
-### Running the System
-
-**Start Backend Server:**
-
-```bash
-cd backend
-npm run dev
-```
-
-The backend will start on `http://localhost:3000`
-
-**Start Frontend** (optional):
-
+3. **Setup Frontend**
 ```bash
 cd temp_app
+npm install
 npm run dev
 ```
 
-The frontend will start on `http://localhost:5173`
-
-## 💡 Usage Examples
-
-### Create a New Agent
-
+4. **Setup Backend** (Coming soon)
 ```bash
-curl -X POST http://localhost:3000/api/agents/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "E-commerce SEO Specialist",
-    "type": "SEO",
-    "templateId": "seo-template",
-    "customCapabilities": ["product-seo", "local-seo"],
-    "customSpecializations": ["shopify", "woocommerce"],
-    "trainingStrategy": "continuous"
-  }'
+cd backend
+npm install
+npm run dev
 ```
 
-### Execute a Workflow
+### Configuration
 
-```bash
-curl -X POST http://localhost:3000/api/workflows/execute \
-  -H "Content-Type: application/json" \
-  -d '{
-    "templateId": "software-development",
-    "inputs": {
-      "description": "Build a real-time chat application with React and Node.js"
-    }
-  }'
+Create `.env` file:
+```env
+# Ollama Configuration
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_DEFAULT_MODEL=llama3
+OLLAMA_CODE_MODEL=codellama:13b
+
+# Database (optional)
+DATABASE_URL=postgresql://user:pass@localhost:5432/agentswamps
+
+# Redis (optional)
+REDIS_URL=redis://localhost:6379
 ```
 
-### Train an Agent
+## 📊 Key Features
 
-```bash
-curl -X POST http://localhost:3000/api/agents/{agentId}/train \
-  -H "Content-Type: application/json" \
-  -d '{
-    "trainingData": [
-      {
-        "taskId": "task-1",
-        "input": "Create a REST API",
-        "output": "/* code here */",
-        "success": true,
-        "feedback": "Excellent implementation"
-      }
-    ]
-  }'
-```
+### ✅ Current (Planned)
+- [x] Comprehensive architecture documentation
+- [x] Low-level system design with diagrams
+- [x] Class structure and relationships
+- [x] Complete API specifications
+- [x] Ollama integration plan
+- [ ] React frontend with Swamp visualization
+- [ ] Agent orchestration system
+- [ ] Task management and decomposition
+- [ ] Real-time WebSocket updates
+- [ ] Local LLM integration with Ollama
 
-### Get Agent Insights
+### 🔮 Future
+- Multi-project support
+- Agent learning and improvement
+- Custom agent training
+- Integration marketplace
+- Collaborative multi-user support
+- Advanced analytics dashboard
 
-```bash
-curl http://localhost:3000/api/agents/{agentId}/insights
-```
+## 🎨 UI Design
 
-### Submit a Code Generation Task
+### Theme: Premium Dark Mode
+- **Colors**: Deep Navy (#0a0e27), Neon Accent (#00ff88)
+- **Style**: Glassmorphism with subtle animations
+- **Vibe**: "Alive" and responsive with "wow" factor
 
-```bash
-curl -X POST http://localhost:3000/api/tasks \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Create REST API",
-    "description": "Create a RESTful API for a todo list with CRUD operations using Express and TypeScript",
-    "type": "CODE_GENERATION",
-    "priority": "HIGH",
-    "requiredCapabilities": ["TypeScript", "Node.js", "Express"]
-  }'
-```
-
-### Check Task Status
-
-```bash
-curl http://localhost:3000/api/tasks/{taskId}
-```
-
-### View All Agents
-
-```bash
-curl http://localhost:3000/api/agents
-```
-
-### Get System Statistics
-
-```bash
-curl http://localhost:3000/api/system/stats
-```
-
-## 🎯 Agent Selection Algorithm
-
-The system uses a sophisticated multi-factor scoring algorithm to select the best agent for each task:
-
-```
-Agent Score = 0.35 × Specialization Match
-            + 0.25 × Historical Success
-            + 0.20 × Availability
-            + 0.15 × Recent Performance
-            + 0.05 × Load Balance
-```
-
-This ensures:
-- **Expertise**: Tasks go to agents with relevant skills
-- **Reliability**: Agents with proven track records are preferred
-- **Efficiency**: Workload is distributed evenly
-- **Quality**: Performance trends influence future assignments
-
-## 🤖 Available Agents
-
-## 🤖 Available Agents
-
-### Currently Implemented
-
-1. **Developer Agent** 🔧
-   - Code generation and scaffolding
-   - Code review and refactoring
-   - Debugging assistance
-   - Best practices recommendations
-   - **Supports**: JavaScript, TypeScript, Python, Java, Go
-   - **Frameworks**: React, Node.js, Express, FastAPI, Spring Boot
-
-2. **QA Agent** ✅
-   - Test case generation
-   - Test plan creation
-   - Quality assurance reviews
-   - Bug reporting and analysis
-   - **Supports**: Jest, Vitest, Pytest, JUnit, Mocha
-
-3. **Product Manager Agent** 📋
-   - Requirements analysis
-   - Task prioritization (MoSCoW method)
-   - Roadmap planning
-   - Stakeholder management
-   - Sprint planning
-
-4. **SEO Agent** 🔍 *(NEW)*
-   - Keyword research and strategy
-   - On-page SEO optimization
-   - Technical SEO audits
-   - Content optimization
-   - Meta tags and schema markup
-   - Competitor analysis
-
-5. **Lead Generation Agent** 📈 *(NEW)*
-   - Campaign strategy and planning
-   - Funnel design and optimization
-   - Email marketing and nurture campaigns
-   - Landing page optimization
-   - Lead scoring and segmentation
-   - Multi-channel campaigns
-
-6. **AI/ML Expert Agent** 🧠 *(NEW)*
-   - Model selection and evaluation design
-   - Data contracts via JSON Schema
-   - MLOps readiness with monitoring hooks
-   - Connector-aware plans (OpenAPI webhooks, BPMN nodes)
-
-7. **Mentor Lead Agent** 🎯 *(NEW)*
-   - Coaching and retrospectives
-   - Skill gap assessment and pairing plans
-   - Feedback loops that update learning profiles
-   - Supports continuous improvement workflows
-
-### Agent Capabilities
-
-All agents support:
-- ✅ Continuous learning from task execution
-- ✅ Performance tracking and insights
-- ✅ Custom specializations
-- ✅ Template-based creation
-- ✅ Reinforcement training
-
-### Coming Soon
-
-- DevOps Agent (CI/CD, deployment)
-- Designer Agent (UI/UX)
-- Marketing Agent (content creation)
-- Research Agent (information gathering)
-
-## 🔧 Technology Stack
-
-### Backend
-- **Runtime**: Node.js 18+
-- **Language**: TypeScript
-- **Framework**: Express.js
-- **WebSocket**: Socket.io
-- **AI Models**: Google Gemini (primary), extensible to others
-
-### Frontend
-- **Framework**: React 18
-- **Language**: TypeScript
-- **Build Tool**: Vite
-- **Styling**: CSS (with premium dark theme)
-- **State**: React Context + Hooks
-
-### Future Integration
-- **Database**: PostgreSQL for persistence
-- **Cache**: Redis for performance
-- **Vector DB**: Pinecone/Chroma for knowledge base
-- **Monitoring**: Prometheus + Grafana
-
-## 🏛️ Design Patterns
-
-The system implements several key design patterns:
-
-- **Abstract Factory**: Agent creation and registration
-- **Strategy**: Pluggable model providers
-- **Observer**: Event-driven agent communication
-- **Command**: Task execution and queuing
-- **Singleton**: Orchestrator and registry management
-- **Adapter**: Unified interface for different AI models
-
-## 📊 Monitoring & Metrics
-
-The system tracks comprehensive metrics:
-
-- **Agent Performance**: Success rate, average completion time, task distribution
-- **Task Metrics**: Queue depth, processing time, failure rates
-- **System Health**: Agent availability, load distribution, API response times
-- **Model Usage**: Provider statistics, error rates, fallback frequency
+### Components
+1. **Swamp Canvas**: Interactive agent network visualization
+2. **Agent Nodes**: Animated status indicators
+3. **Command Dashboard**: System metrics and controls
+4. **Neural Link**: Human-AI chat interface
+5. **Task List**: Project and task management
 
 ## 🔐 Security
 
-- API key management through environment variables
-- Request validation and sanitization
-- Rate limiting and quota management
-- Sandboxed agent execution (planned)
-- PII redaction in logs (planned)
+- JWT-based authentication
+- Role-based access control (RBAC)
+- Agent sandboxing in isolated environments
+- Code review gates for critical operations
+- Complete audit logging
+- Encrypted data at rest and in transit
 
-## 🛣️ Roadmap
+## 📈 Performance
 
-- [x] Core orchestration engine
-- [x] Basic agents (Developer, QA, PM)
-- [x] Google Gemini integration
-- [x] REST API
-- [x] WebSocket real-time updates
-- [ ] Additional agents (DevOps, Designer, Research)
-- [ ] Database persistence
-- [ ] Vector database for knowledge management
-- [ ] Enhanced frontend with live visualization
-- [ ] Multi-model support (OpenAI, Claude, local models)
-- [ ] Agent collaboration protocols
-- [ ] Advanced monitoring and analytics
-- [ ] Docker deployment
-- [ ] Kubernetes orchestration
+### Targets
+- API Response: < 100ms (95th percentile)
+- UI Render: 60 FPS
+- Ollama Inference: < 2s (small prompts)
+- WebSocket Latency: < 50ms
+- Concurrent Agents: 50-100 per instance
+
+## 🛠️ Technology Stack
+
+### Frontend
+- React 18 + TypeScript
+- Vite (build tool)
+- Vanilla CSS with CSS Variables
+- HTML5 Canvas for visualization
+
+### Backend
+- Node.js / Python
+- Express or FastAPI
+- PostgreSQL (database)
+- Redis (caching & message queue)
+
+### AI/ML
+- Ollama (local LLM server)
+- LangChain or AutoGen (agent framework)
+- ChromaDB or Qdrant (vector database)
+
+## 📖 Documentation Map
+
+```
+├── README.md (this file)
+├── FRAMEWORK_DEFINITION.md
+│   ├── Overview & Principles
+│   ├── Technology Stack
+│   ├── Component Structure
+│   └── Future Enhancements
+│
+├── ARCHITECTURE.md
+│   ├── System Layers
+│   ├── Component Architecture
+│   ├── Data Flow Diagrams
+│   ├── Database Schema
+│   ├── API Specification
+│   └── Deployment Architecture
+│
+├── CLASS_DIAGRAMS.md
+│   ├── Frontend Classes
+│   ├── Backend Classes
+│   ├── Agent Classes
+│   ├── Ollama Integration
+│   └── Data Models
+│
+├── FUNCTION_CALLING.md
+│   ├── Frontend API Calls
+│   ├── Backend Endpoints
+│   ├── Inter-Agent Communication
+│   ├── Ollama Integration
+│   └── WebSocket Protocol
+│
+├── OLLAMA_INTEGRATION.md
+│   ├── Overview & Setup
+│   ├── Architecture Integration
+│   ├── Model Selection
+│   ├── Implementation Guide
+│   └── Deployment Strategy
+│
+├── WORKFLOWS.md
+│   ├── Complete System Workflow
+│   ├── Agent Collaboration
+│   ├── Real-time Updates
+│   ├── Ollama Integration Flow
+│   ├── Task Decomposition
+│   ├── Agent Lifecycle
+│   ├── Message Patterns
+│   └── Error Handling
+│
+└── NAVIGATION.md
+    ├── Navigation Guide
+    ├── Quick Reference
+    ├── Use Case Scenarios
+    └── Documentation Matrix
+```
 
 ## 🤝 Contributing
 
-Contributions are welcome! This is a prototype system designed to showcase end-to-end multi-agent orchestration.
+This is currently a prototype/planning phase project. Contributions to the documentation and architecture are welcome!
 
 ## 📄 License
 
-MIT License - see LICENSE file for details
+[To be determined]
 
-## 🙏 Acknowledgments
+## 🔗 Resources
 
-- Inspired by Google's Agentic Design Templates
-- Built with cutting-edge AI model integration
-- Designed for extensibility and real-world applications
+- [Ollama Documentation](https://github.com/ollama/ollama)
+- [React Documentation](https://react.dev)
+- [LangChain](https://python.langchain.com)
+- [AutoGen](https://microsoft.github.io/autogen/)
+
+## 📞 Contact
+
+For questions or suggestions, please open an issue on GitHub.
 
 ---
 
-**Built with ❤️ for autonomous software development**
+**Built with ❤️ for the future of autonomous software development**

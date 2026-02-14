@@ -1,465 +1,670 @@
-# Class Diagrams - Agent Swamps System
+# Class Diagrams - Agent Swamps
 
-## Core Class Structure
+This document contains detailed class diagrams for all major components of the Agent Swamps system.
 
-### 1. Agent System Classes
+## Frontend Class Structure
+
+### Component Class Hierarchy
 
 ```mermaid
 classDiagram
-    class Agent {
+    class Component {
         <<abstract>>
-        +String id
-        +String name
-        +AgentType type
-        +AgentStatus status
-        +AgentCapabilities capabilities
-        +PerformanceMetrics metrics
-        +initialize() void
-        +processTask(task: Task) Promise~TaskResult~
+        +props: Props
+        +state: State
+        +render() ReactElement
+        +componentDidMount() void
+        +componentWillUnmount() void
+    }
+    
+    class App {
+        -agents: Agent[]
+        -tasks: Task[]
+        -systemStatus: SystemStatus
+        +render() ReactElement
+        +handleTaskCreate(task: Task) void
+        +handleAgentCommand(cmd: Command) void
+    }
+    
+    class SwampCanvas {
+        -canvasRef: RefObject
+        -agents: Agent[]
+        -connections: Connection[]
+        -animationFrame: number
+        +render() ReactElement
+        +drawAgents() void
+        +drawConnections() void
+        +animate() void
+        +handleAgentClick(agent: Agent) void
+        +handleAgentDrag(agent: Agent, pos: Position) void
+    }
+    
+    class AgentNode {
+        -agent: Agent
+        -position: Position
+        -status: AgentStatus
+        +render() ReactElement
+        +getStatusColor() string
+        +getStatusIcon() Icon
+        +handleClick() void
+    }
+    
+    class CommandDashboard {
+        -metrics: Metrics
+        -filters: FilterState
+        +render() ReactElement
+        +updateMetrics() void
+        +handleFilterChange(filter: Filter) void
+    }
+    
+    class NeuralLink {
+        -messages: Message[]
+        -input: string
+        -ws: WebSocket
+        +render() ReactElement
+        +sendMessage(msg: string) void
+        +handleIncomingMessage(msg: Message) void
+        +scrollToBottom() void
+    }
+    
+    class TaskList {
+        -tasks: Task[]
+        -selectedTask: Task | null
+        -sortBy: SortOption
+        +render() ReactElement
+        +handleTaskSelect(task: Task) void
+        +handleTaskSort(option: SortOption) void
+        +filterTasks(filter: TaskFilter) Task[]
+    }
+    
+    Component <|-- App
+    Component <|-- SwampCanvas
+    Component <|-- AgentNode
+    Component <|-- CommandDashboard
+    Component <|-- NeuralLink
+    Component <|-- TaskList
+    
+    App --> SwampCanvas
+    App --> CommandDashboard
+    App --> NeuralLink
+    App --> TaskList
+    SwampCanvas --> AgentNode
+```
+
+### Context Providers
+
+```mermaid
+classDiagram
+    class AgentContext {
+        -agents: Agent[]
+        -selectedAgent: Agent | null
+        +addAgent(agent: Agent) void
+        +removeAgent(id: string) void
+        +updateAgent(id: string, updates: Partial~Agent~) void
+        +selectAgent(id: string) void
+    }
+    
+    class TaskContext {
+        -tasks: Task[]
+        -activeTasks: Task[]
+        -completedTasks: Task[]
+        +createTask(task: TaskInput) Task
+        +updateTask(id: string, updates: Partial~Task~) void
+        +deleteTask(id: string) void
+        +getTaskById(id: string) Task | null
+    }
+    
+    class WebSocketContext {
+        -ws: WebSocket | null
+        -connected: boolean
+        -messageQueue: Message[]
+        +connect(url: string) void
+        +disconnect() void
+        +send(message: Message) void
+        +subscribe(channel: string, handler: Function) void
+        +unsubscribe(channel: string) void
+    }
+    
+    class UIContext {
+        -theme: Theme
+        -sidebarOpen: boolean
+        -modalState: ModalState
+        +toggleSidebar() void
+        +openModal(type: string, props: any) void
+        +closeModal() void
+        +setTheme(theme: Theme) void
+    }
+```
+
+### Service Classes
+
+```mermaid
+classDiagram
+    class APIService {
+        -baseURL: string
+        -token: string | null
+        +setToken(token: string) void
+        +get~T~(endpoint: string, params?: any) Promise~T~
+        +post~T~(endpoint: string, data: any) Promise~T~
+        +put~T~(endpoint: string, data: any) Promise~T~
+        +delete~T~(endpoint: string) Promise~T~
+    }
+    
+    class TaskService {
+        -api: APIService
+        +getTasks(filters?: TaskFilter) Promise~Task[]~
+        +getTask(id: string) Promise~Task~
+        +createTask(task: TaskInput) Promise~Task~
+        +updateTask(id: string, updates: Partial~Task~) Promise~Task~
+        +deleteTask(id: string) Promise~void~
+        +getTaskArtifacts(id: string) Promise~Artifact[]~
+    }
+    
+    class AgentService {
+        -api: APIService
+        +getAgents() Promise~Agent[]~
+        +getAgent(id: string) Promise~Agent~
+        +spawnAgent(type: AgentType, config: AgentConfig) Promise~Agent~
+        +terminateAgent(id: string) Promise~void~
+        +sendCommand(id: string, command: Command) Promise~void~
+        +getAgentMessages(id: string) Promise~Message[]~
+    }
+    
+    class WebSocketService {
+        -ws: WebSocket | null
+        -handlers: Map~string, Function[]~
+        -reconnectAttempts: number
+        +connect(url: string) void
+        +disconnect() void
+        +send(message: any) void
+        +on(event: string, handler: Function) void
+        +off(event: string, handler: Function) void
+        -reconnect() void
+        -handleMessage(message: MessageEvent) void
+    }
+    
+    class StorageService {
+        +get~T~(key: string) T | null
+        +set~T~(key: string, value: T) void
+        +remove(key: string) void
+        +clear() void
+    }
+    
+    TaskService --> APIService
+    AgentService --> APIService
+```
+
+## Backend Class Structure
+
+### Core Service Classes
+
+```mermaid
+classDiagram
+    class Server {
+        -app: Express
+        -port: number
+        -wsServer: WebSocketServer
+        +start() void
+        +stop() void
+        -setupMiddleware() void
+        -setupRoutes() void
+        -setupWebSocket() void
+    }
+    
+    class AgentOrchestrator {
+        -agents: Map~string, AgentInstance~
+        -messageRouter: MessageRouter
+        -scheduler: TaskScheduler
+        -monitor: HealthMonitor
+        +spawnAgent(type: AgentType, config: AgentConfig) AgentInstance
+        +terminateAgent(id: string) void
+        +assignTask(agentId: string, task: Task) void
+        +getAgentStatus(id: string) AgentStatus
+        +getAllAgents() AgentInstance[]
+        -selectAgentForTask(task: Task) string
+    }
+    
+    class TaskManager {
+        -tasks: Map~string, Task~
+        -db: Database
+        +createTask(input: TaskInput) Task
+        +updateTask(id: string, updates: Partial~Task~) Task
+        +deleteTask(id: string) void
+        +getTask(id: string) Task
+        +getTasks(filter: TaskFilter) Task[]
+        +decomposeTask(task: Task) Task[]
+        -validateTask(task: Task) boolean
+        -resolveDependencies(task: Task) Task[]
+    }
+    
+    class StateManager {
+        -db: Database
+        -cache: RedisClient
+        +saveState(key: string, state: any) void
+        +loadState(key: string) any
+        +updateState(key: string, updates: any) void
+        +deleteState(key: string) void
+        +createSnapshot(label: string) Snapshot
+        +restoreSnapshot(id: string) void
+        -persist(key: string, data: any) void
+    }
+    
+    class MessageBus {
+        -queue: Queue
+        -subscribers: Map~string, Subscriber[]~
+        +publish(topic: string, message: Message) void
+        +subscribe(topic: string, handler: Function) string
+        +unsubscribe(subscriptionId: string) void
+        +request(topic: string, message: Message) Promise~Message~
+        -routeMessage(message: Message) void
+        -filterMessage(message: Message, filter: Filter) boolean
+    }
+    
+    Server --> AgentOrchestrator
+    Server --> TaskManager
+    Server --> StateManager
+    Server --> MessageBus
+```
+
+### Agent Classes
+
+```mermaid
+classDiagram
+    class BaseAgent {
+        <<abstract>>
+        #id: string
+        #type: AgentType
+        #status: AgentStatus
+        #memory: Memory
+        #tools: Tool[]
+        #messageBus: MessageBus
+        +execute(task: Task) Promise~Result~
+        +processMessage(message: Message) void
         +updateStatus(status: AgentStatus) void
-        +getMetrics() PerformanceMetrics
-        +canHandle(task: Task) boolean
-        #executeWithModel(prompt: string) Promise~string~
-        #validate(result: any) boolean
+        #think(context: Context) Promise~Decision~
+        #act(decision: Decision) Promise~Result~
+        #observe(result: Result) void
     }
-
+    
     class DeveloperAgent {
-        +String[] programmingLanguages
-        +String[] frameworks
-        +CodeRepository repository
-        +writeCode(specification: string) Promise~Code~
+        -codeGenerator: CodeGenerator
+        -codeReviewer: CodeReviewer
+        -refactoringEngine: RefactoringEngine
+        +execute(task: Task) Promise~Result~
+        +generateCode(spec: Specification) Promise~Code~
         +reviewCode(code: Code) Promise~Review~
-        +refactor(code: Code) Promise~Code~
-        +debugIssue(issue: Issue) Promise~Solution~
+        +refactorCode(code: Code, rules: Rule[]) Promise~Code~
+        -analyzeRequirements(task: Task) Requirements
+        -selectTechnologies(requirements: Requirements) TechStack
     }
-
+    
     class QAAgent {
-        +String[] testingFrameworks
-        +TestStrategy strategy
-        +createTestPlan(requirements: Requirements) Promise~TestPlan~
+        -testGenerator: TestGenerator
+        -testRunner: TestRunner
+        -coverageAnalyzer: CoverageAnalyzer
+        +execute(task: Task) Promise~Result~
         +generateTests(code: Code) Promise~TestSuite~
-        +executeTests(tests: TestSuite) Promise~TestResults~
-        +reportBugs(results: TestResults) Promise~BugReport[]~
+        +runTests(tests: TestSuite) Promise~TestResults~
+        +analyzeCoverage(results: TestResults) Promise~Coverage~
+        -identifyEdgeCases(code: Code) Scenario[]
+        -generateTestData() TestData
     }
-
+    
     class DevOpsAgent {
-        +String[] platforms
-        +String[] tools
-        +setupCI_CD(project: Project) Promise~Pipeline~
-        +deployApplication(app: Application) Promise~Deployment~
-        +monitorSystem(system: System) Promise~Metrics~
-        +scaleResources(requirements: Requirements) Promise~void~
+        -deployer: Deployer
+        -infraManager: InfrastructureManager
+        -cicdManager: CICDManager
+        +execute(task: Task) Promise~Result~
+        +deploy(artifact: Artifact, env: Environment) Promise~Deployment~
+        +setupInfrastructure(spec: InfraSpec) Promise~Infrastructure~
+        +configureCICD(config: CICDConfig) Promise~Pipeline~
+        -validateDeployment(deployment: Deployment) boolean
     }
-
+    
     class ProductManagerAgent {
-        +analyzeRequirements(input: string) Promise~Requirements~
-        +prioritizeTasks(tasks: Task[]) Promise~Task[]~
-        +createRoadmap(requirements: Requirements) Promise~Roadmap~
-        +trackProgress(project: Project) Promise~Report~
+        -requirementAnalyzer: RequirementAnalyzer
+        -prioritizer: Prioritizer
+        +execute(task: Task) Promise~Result~
+        +analyzeRequirements(input: UserInput) Requirements
+        +prioritizeFeatures(features: Feature[]) Feature[]
+        +createRoadmap(features: Feature[]) Roadmap
+        -defineAcceptanceCriteria(feature: Feature) Criteria[]
     }
-
-    class DesignerAgent {
-        +String[] designTools
-        +DesignSystem designSystem
-        +createMockup(requirements: Requirements) Promise~Design~
-        +designUI(specifications: Specifications) Promise~UIDesign~
-        +createAssets(needs: AssetNeeds) Promise~Asset[]~
+    
+    class ArchitectAgent {
+        -designGenerator: DesignGenerator
+        -patternMatcher: PatternMatcher
+        +execute(task: Task) Promise~Result~
+        +designSystem(requirements: Requirements) Architecture
+        +selectPatterns(context: Context) Pattern[]
+        +generateDiagrams(architecture: Architecture) Diagram[]
+        -evaluateTradeoffs(options: Option[]) Decision
     }
-
-    class ResearchAgent {
-        +String[] domains
-        +conductResearch(topic: string) Promise~ResearchReport~
-        +analyzeTrends(domain: string) Promise~TrendAnalysis~
-        +gatherInformation(query: string) Promise~Information~
-    }
-
-    Agent <|-- DeveloperAgent
-    Agent <|-- QAAgent
-    Agent <|-- DevOpsAgent
-    Agent <|-- ProductManagerAgent
-    Agent <|-- DesignerAgent
-    Agent <|-- ResearchAgent
+    
+    BaseAgent <|-- DeveloperAgent
+    BaseAgent <|-- QAAgent
+    BaseAgent <|-- DevOpsAgent
+    BaseAgent <|-- ProductManagerAgent
+    BaseAgent <|-- ArchitectAgent
 ```
 
-### 2. Orchestration System Classes
+### Tool and Utility Classes
 
 ```mermaid
 classDiagram
-    class Orchestrator {
-        +String id
-        +AgentRegistry agentRegistry
-        +TaskQueue taskQueue
-        +AgentSelector selector
-        +MessageBroker messageBroker
-        +submitTask(task: Task) Promise~string~
-        +getTaskStatus(taskId: string) TaskStatus
-        +assignTask(task: Task, agent: Agent) Promise~void~
-        +coordinateAgents(task: Task) Promise~TaskResult~
-        +handleAgentFailure(agent: Agent, error: Error) void
-        -distributeComplexTask(task: Task) Task[]
-    }
-
-    class AgentRegistry {
-        -Map~string, Agent~ agents
-        -Map~string, AgentMetadata~ metadata
-        +registerAgent(agent: Agent) void
-        +unregisterAgent(agentId: string) void
-        +getAgent(agentId: string) Agent
-        +getAvailableAgents() Agent[]
-        +getAgentsByType(type: AgentType) Agent[]
-        +updateAgentStatus(agentId: string, status: AgentStatus) void
-        +getAgentMetrics(agentId: string) PerformanceMetrics
-    }
-
-    class AgentSelector {
-        -ScoringAlgorithm algorithm
-        -HistoricalData history
-        +selectAgent(task: Task, availableAgents: Agent[]) Agent
-        +selectAgents(task: Task, count: number) Agent[]
-        +scoreAgent(agent: Agent, task: Task) number
-        -calculateSpecializationScore(agent: Agent, task: Task) number
-        -calculatePerformanceScore(agent: Agent) number
-        -calculateAvailabilityScore(agent: Agent) number
-    }
-
-    class TaskQueue {
-        -Queue~Task~ highPriority
-        -Queue~Task~ normalPriority
-        -Queue~Task~ lowPriority
-        -Map~string, Task~ activeTasks
-        +enqueue(task: Task) void
-        +dequeue() Task
-        +getNext() Task
-        +getTaskStatus(taskId: string) TaskStatus
-        +updateTask(taskId: string, update: TaskUpdate) void
-        +getPendingTasks() Task[]
-    }
-
-    class MessageBroker {
-        -Map~string, MessageQueue~ queues
-        -EventEmitter eventBus
-        +publish(message: AgentMessage) void
-        +subscribe(agentId: string, handler: MessageHandler) void
-        +unsubscribe(agentId: string) void
-        +broadcast(message: AgentMessage) void
-        +sendToAgent(agentId: string, message: AgentMessage) void
-        -routeMessage(message: AgentMessage) void
-    }
-
-    Orchestrator --> AgentRegistry
-    Orchestrator --> TaskQueue
-    Orchestrator --> AgentSelector
-    Orchestrator --> MessageBroker
-```
-
-### 3. Model Integration Classes
-
-```mermaid
-classDiagram
-    class ModelProvider {
+    class Tool {
         <<interface>>
-        +String name
-        +ModelCapabilities capabilities
-        +generate(prompt: string, options: GenerateOptions) Promise~string~
-        +generateStream(prompt: string, options: GenerateOptions) AsyncIterator~string~
-        +embed(text: string) Promise~number[]~
-        +getCapabilities() ModelCapabilities
+        +name: string
+        +description: string
+        +execute(params: any) Promise~any~
+        +validate(params: any) boolean
     }
-
-    class GeminiProvider {
-        -String apiKey
-        -GeminiClient client
-        -String model
-        +generate(prompt: string, options: GenerateOptions) Promise~string~
-        +generateStream(prompt: string, options: GenerateOptions) AsyncIterator~string~
-        +embed(text: string) Promise~number[]~
-        +getCapabilities() ModelCapabilities
-        -buildRequest(prompt: string, options: GenerateOptions) GeminiRequest
+    
+    class CodeGenerator {
+        -ollamaClient: OllamaClient
+        -templates: TemplateEngine
+        +generate(spec: Specification) Promise~Code~
+        +generateFromTemplate(template: string, vars: any) Code
+        -buildPrompt(spec: Specification) string
+        -parseResponse(response: string) Code
     }
-
-    class OpenAIProvider {
-        -String apiKey
-        -OpenAIClient client
-        -String model
-        +generate(prompt: string, options: GenerateOptions) Promise~string~
-        +generateStream(prompt: string, options: GenerateOptions) AsyncIterator~string~
-        +embed(text: string) Promise~number[]~
-        +getCapabilities() ModelCapabilities
+    
+    class TestGenerator {
+        -ollamaClient: OllamaClient
+        -analyzer: CodeAnalyzer
+        +generateUnitTests(code: Code) Promise~Test[]~
+        +generateIntegrationTests(modules: Module[]) Promise~Test[]~
+        +generateE2ETests(flows: UserFlow[]) Promise~Test[]~
+        -identifyTestCases(code: Code) TestCase[]
     }
-
-    class OllamaProvider {
-        -String baseUrl
-        -String model
-        +generate(prompt: string, options: GenerateOptions) Promise~string~
-        +generateStream(prompt: string, options: GenerateOptions) AsyncIterator~string~
-        +embed(text: string) Promise~number[]~
-        +getCapabilities() ModelCapabilities
+    
+    class Deployer {
+        -containerEngine: ContainerEngine
+        -orchestrator: Orchestrator
+        +buildImage(artifact: Artifact) Promise~Image~
+        +pushImage(image: Image) Promise~void~
+        +deploy(image: Image, config: DeployConfig) Promise~Deployment~
+        +rollback(deploymentId: string) Promise~void~
     }
-
-    class ModelRouter {
-        -Map~string, ModelProvider~ providers
-        -String defaultProvider
-        -LoadBalancer loadBalancer
-        +registerProvider(name: string, provider: ModelProvider) void
-        +route(request: ModelRequest) ModelProvider
-        +generate(prompt: string, options: GenerateOptions) Promise~string~
-        +healthCheck() Map~string, boolean~
-        -selectProvider(task: Task) ModelProvider
+    
+    class Memory {
+        -shortTerm: Map~string, any~
+        -longTerm: VectorStore
+        +store(key: string, value: any, type: MemoryType) void
+        +retrieve(key: string) any
+        +search(query: string) any[]
+        +clear(type: MemoryType) void
     }
-
-    ModelProvider <|.. GeminiProvider
-    ModelProvider <|.. OpenAIProvider
-    ModelProvider <|.. OllamaProvider
-    ModelRouter --> ModelProvider
+    
+    Tool <|.. CodeGenerator
+    Tool <|.. TestGenerator
+    Tool <|.. Deployer
 ```
 
-### 4. Task and Context Classes
+## Ollama Integration Classes
+
+```mermaid
+classDiagram
+    class OllamaClient {
+        -baseURL: string
+        -timeout: number
+        -retryPolicy: RetryPolicy
+        +generate(prompt: string, model: string, options: Options) Promise~Response~
+        +chat(messages: Message[], model: string) Promise~Response~
+        +listModels() Promise~Model[]~
+        +pullModel(name: string) Promise~void~
+        +embeddings(text: string, model: string) Promise~number[]~
+        -request(endpoint: string, data: any) Promise~any~
+        -retry(fn: Function, attempts: number) Promise~any~
+    }
+    
+    class ModelManager {
+        -registry: Map~string, ModelInfo~
+        -cache: ModelCache
+        +loadModel(name: string) Promise~Model~
+        +unloadModel(name: string) void
+        +getAvailableModels() Model[]
+        +getModelInfo(name: string) ModelInfo
+        +optimizeModel(model: Model, config: OptimizationConfig) Model
+    }
+    
+    class PromptBuilder {
+        -templates: Map~string, Template~
+        +buildPrompt(type: PromptType, context: any) string
+        +addContext(prompt: string, context: any) string
+        +formatMessages(messages: Message[]) string
+        -applyTemplate(template: Template, vars: any) string
+    }
+    
+    class ResponseParser {
+        -patterns: RegExp[]
+        +parse(response: string, format: Format) any
+        +extractCode(response: string) Code
+        +extractJSON(response: string) any
+        +validate(parsed: any, schema: Schema) boolean
+    }
+    
+    class ConnectionPool {
+        -connections: Connection[]
+        -maxSize: number
+        -currentSize: number
+        +acquire() Promise~Connection~
+        +release(connection: Connection) void
+        +drain() Promise~void~
+        -createConnection() Connection
+        -validateConnection(connection: Connection) boolean
+    }
+    
+    OllamaClient --> ConnectionPool
+    OllamaClient --> ModelManager
+    OllamaClient --> PromptBuilder
+    OllamaClient --> ResponseParser
+```
+
+## Data Model Classes
 
 ```mermaid
 classDiagram
     class Task {
-        +String id
-        +String title
-        +String description
-        +TaskType type
-        +TaskPriority priority
-        +TaskStatus status
-        +String[] requiredCapabilities
-        +Map~string, any~ context
-        +Task[] dependencies
-        +Date createdAt
-        +Date updatedAt
-        +String assignedTo
-        +validate() boolean
-        +toJSON() object
+        +id: string
+        +type: TaskType
+        +description: string
+        +assignedTo?: string
+        +dependencies: string[]
+        +status: TaskStatus
+        +priority: Priority
+        +createdAt: Date
+        +completedAt?: Date
+        +artifacts: Artifact[]
+        +metadata: Map~string, any~
     }
-
-    class TaskResult {
-        +String taskId
-        +boolean success
-        +any result
-        +Error error
-        +Map~string, any~ metadata
-        +number executionTime
-        +String agentId
-        +Date completedAt
+    
+    class Agent {
+        +id: string
+        +type: AgentType
+        +status: AgentStatus
+        +configuration: AgentConfig
+        +createdAt: Date
+        +lastActive: Date
+        +currentTask?: string
+        +capabilities: Capability[]
+        +metrics: AgentMetrics
     }
-
-    class Context {
-        +String sessionId
-        +Map~string, any~ variables
-        +ConversationHistory history
-        +ProjectInfo project
-        +set(key: string, value: any) void
-        +get(key: string) any
-        +merge(context: Context) void
-        +clear() void
-        +snapshot() ContextSnapshot
+    
+    class Message {
+        +id: string
+        +from: string
+        +to: string | string[]
+        +type: MessageType
+        +payload: any
+        +timestamp: Date
+        +priority: Priority
+        +correlationId?: string
     }
-
-    class ConversationHistory {
-        +Message[] messages
-        +number maxSize
-        +addMessage(message: Message) void
-        +getRecent(count: number) Message[]
-        +clear() void
-        +summarize() string
-        +export() object
+    
+    class Artifact {
+        +id: string
+        +taskId: string
+        +type: ArtifactType
+        +content: string
+        +filePath?: string
+        +createdAt: Date
+        +metadata: Map~string, any~
     }
-
-    class PerformanceMetrics {
-        +number totalTasks
-        +number successfulTasks
-        +number failedTasks
-        +number averageCompletionTime
-        +number successRate
-        +Map~string, number~ taskTypeMetrics
-        +Date lastUpdated
-        +update(result: TaskResult) void
-        +getSuccessRate() number
-        +reset() void
+    
+    class AgentMetrics {
+        +tasksCompleted: number
+        +tasksInProgress: number
+        +tasksFailed: number
+        +averageTaskTime: number
+        +successRate: number
+        +lastTaskDuration: number
     }
-
-    Task --> TaskResult
-    Agent --> Context
-    Agent --> PerformanceMetrics
-    Context --> ConversationHistory
+    
+    class AgentConfig {
+        +model: string
+        +temperature: number
+        +maxTokens: number
+        +systemPrompt: string
+        +tools: string[]
+        +customSettings: Map~string, any~
+    }
+    
+    Task --> Artifact
+    Agent --> AgentConfig
+    Agent --> AgentMetrics
 ```
 
-### 5. Data Storage Classes
+## Enum and Type Definitions
 
 ```mermaid
 classDiagram
-    class MemoryStore {
-        <<interface>>
-        +save(key: string, value: any, ttl: number) Promise~void~
-        +get(key: string) Promise~any~
-        +delete(key: string) Promise~void~
-        +exists(key: string) Promise~boolean~
-        +clear() Promise~void~
+    class AgentType {
+        <<enumeration>>
+        DEVELOPER
+        QA
+        DEVOPS
+        PRODUCT_MANAGER
+        ARCHITECT
+        DESIGNER
     }
-
-    class RedisMemoryStore {
-        -RedisClient client
-        +save(key: string, value: any, ttl: number) Promise~void~
-        +get(key: string) Promise~any~
-        +delete(key: string) Promise~void~
-        +exists(key: string) Promise~boolean~
-        +clear() Promise~void~
+    
+    class AgentStatus {
+        <<enumeration>>
+        IDLE
+        THINKING
+        CODING
+        TESTING
+        DEPLOYING
+        ERROR
+        PAUSED
     }
-
-    class VectorDatabase {
-        <<interface>>
-        +upsert(id: string, vector: number[], metadata: object) Promise~void~
-        +query(vector: number[], topK: number) Promise~QueryResult[]~
-        +delete(id: string) Promise~void~
-        +createIndex(dimension: number) Promise~void~
+    
+    class TaskStatus {
+        <<enumeration>>
+        PENDING
+        IN_PROGRESS
+        BLOCKED
+        COMPLETED
+        FAILED
+        CANCELLED
     }
-
-    class PineconeVectorDB {
-        -PineconeClient client
-        -String indexName
-        +upsert(id: string, vector: number[], metadata: object) Promise~void~
-        +query(vector: number[], topK: number) Promise~QueryResult[]~
-        +delete(id: string) Promise~void~
-        +createIndex(dimension: number) Promise~void~
+    
+    class TaskType {
+        <<enumeration>>
+        FEATURE
+        BUG_FIX
+        REFACTOR
+        DOCUMENTATION
+        DEPLOYMENT
+        TESTING
+        RESEARCH
     }
-
-    class KnowledgeBase {
-        -VectorDatabase vectorDB
-        -MemoryStore memoryStore
-        -ModelProvider embedder
-        +addDocument(document: Document) Promise~void~
-        +search(query: string, topK: number) Promise~Document[]~
-        +update(docId: string, document: Document) Promise~void~
-        +delete(docId: string) Promise~void~
-        -generateEmbedding(text: string) Promise~number[]~
+    
+    class MessageType {
+        <<enumeration>>
+        TASK_ASSIGNMENT
+        TASK_PROGRESS
+        TASK_COMPLETE
+        REQUEST
+        RESPONSE
+        BROADCAST
+        ERROR
     }
-
-    MemoryStore <|.. RedisMemoryStore
-    VectorDatabase <|.. PineconeVectorDB
-    KnowledgeBase --> VectorDatabase
-    KnowledgeBase --> MemoryStore
-    KnowledgeBase --> ModelProvider
+    
+    class Priority {
+        <<enumeration>>
+        LOW
+        MEDIUM
+        HIGH
+        CRITICAL
+    }
 ```
 
-### 6. API Layer Classes
+## Interface Definitions
 
 ```mermaid
 classDiagram
-    class APIServer {
-        +Express app
-        +number port
-        +Router router
-        +WebSocketServer wsServer
-        +initialize() void
-        +start() Promise~void~
-        +stop() Promise~void~
-        -setupRoutes() void
-        -setupMiddleware() void
-        -setupWebSocket() void
+    class IAgentExecutor {
+        <<interface>>
+        +execute(task: Task) Promise~Result~
+        +cancel() void
+        +pause() void
+        +resume() void
     }
-
-    class TaskController {
-        +Orchestrator orchestrator
-        +createTask(req: Request, res: Response) Promise~void~
-        +getTask(req: Request, res: Response) Promise~void~
-        +listTasks(req: Request, res: Response) Promise~void~
-        +updateTask(req: Request, res: Response) Promise~void~
-        +cancelTask(req: Request, res: Response) Promise~void~
+    
+    class IMessageHandler {
+        <<interface>>
+        +handleMessage(message: Message) void
+        +canHandle(message: Message) boolean
     }
-
-    class AgentController {
-        +AgentRegistry registry
-        +listAgents(req: Request, res: Response) Promise~void~
-        +getAgent(req: Request, res: Response) Promise~void~
-        +getAgentMetrics(req: Request, res: Response) Promise~void~
-        +getAgentStatus(req: Request, res: Response) Promise~void~
+    
+    class IStateProvider {
+        <<interface>>
+        +getState() State
+        +setState(state: Partial~State~) void
+        +subscribe(listener: Function) void
+        +unsubscribe(listener: Function) void
     }
-
-    class WebSocketHandler {
-        +Map~string, WebSocket~ connections
-        +MessageBroker broker
-        +handleConnection(socket: WebSocket) void
-        +broadcast(event: string, data: any) void
-        +sendToClient(clientId: string, event: string, data: any) void
-        -handleMessage(socket: WebSocket, message: any) void
-        -handleDisconnect(socket: WebSocket) void
+    
+    class IToolExecutor {
+        <<interface>>
+        +execute(params: any) Promise~any~
+        +validate(params: any) boolean
+        +getSchema() Schema
     }
-
-    APIServer --> TaskController
-    APIServer --> AgentController
-    APIServer --> WebSocketHandler
-    WebSocketHandler --> MessageBroker
+    
+    class ICache {
+        <<interface>>
+        +get~T~(key: string) Promise~T | null~
+        +set~T~(key: string, value: T, ttl?: number) Promise~void~
+        +delete(key: string) Promise~void~
+        +clear() Promise~void~
+    }
 ```
 
-## Enumeration Types
+## Relationship Summary
 
-```typescript
-enum AgentType {
-    DEVELOPER = 'DEVELOPER',
-    QA = 'QA',
-    DEVOPS = 'DEVOPS',
-    PRODUCT_MANAGER = 'PRODUCT_MANAGER',
-    DESIGNER = 'DESIGNER',
-    MARKETING = 'MARKETING',
-    TECH_WRITER = 'TECH_WRITER',
-    RESEARCH = 'RESEARCH'
-}
+### Key Relationships
 
-enum AgentStatus {
-    INITIALIZED = 'INITIALIZED',
-    IDLE = 'IDLE',
-    ASSIGNED = 'ASSIGNED',
-    THINKING = 'THINKING',
-    EXECUTING = 'EXECUTING',
-    VALIDATING = 'VALIDATING',
-    COMPLETED = 'COMPLETED',
-    ERROR = 'ERROR'
-}
+1. **Inheritance**
+   - All specialized agents inherit from `BaseAgent`
+   - All React components inherit from base `Component`
+   - Tool classes implement the `Tool` interface
 
-enum TaskType {
-    CODE_GENERATION = 'CODE_GENERATION',
-    CODE_REVIEW = 'CODE_REVIEW',
-    TESTING = 'TESTING',
-    DEPLOYMENT = 'DEPLOYMENT',
-    REQUIREMENTS_ANALYSIS = 'REQUIREMENTS_ANALYSIS',
-    DESIGN = 'DESIGN',
-    DOCUMENTATION = 'DOCUMENTATION',
-    RESEARCH = 'RESEARCH'
-}
+2. **Composition**
+   - `AgentOrchestrator` contains multiple `AgentInstance`s
+   - `TaskManager` manages multiple `Task`s
+   - `MessageBus` routes messages between agents
+   - `StateManager` uses both database and cache
 
-enum TaskPriority {
-    LOW = 'LOW',
-    MEDIUM = 'MEDIUM',
-    HIGH = 'HIGH',
-    CRITICAL = 'CRITICAL'
-}
+3. **Dependency**
+   - Services depend on `APIService` for HTTP communication
+   - Agents depend on `OllamaClient` for AI capabilities
+   - Components depend on Context providers for state
 
-enum TaskStatus {
-    PENDING = 'PENDING',
-    ASSIGNED = 'ASSIGNED',
-    IN_PROGRESS = 'IN_PROGRESS',
-    COMPLETED = 'COMPLETED',
-    FAILED = 'FAILED',
-    CANCELLED = 'CANCELLED'
-}
-```
-
-## Key Design Patterns Used
-
-1. **Abstract Factory Pattern**: Agent creation through AgentRegistry
-2. **Strategy Pattern**: Different ModelProviders implementing same interface
-3. **Observer Pattern**: MessageBroker for inter-agent communication
-4. **Singleton Pattern**: Orchestrator and AgentRegistry instances
-5. **Command Pattern**: Task execution and queuing
-6. **Decorator Pattern**: Enhancing agents with additional capabilities
-7. **Adapter Pattern**: Different model providers adapted to common interface
-
-## Class Relationships Summary
-
-- **Inheritance**: Specialized agents inherit from base Agent class
-- **Composition**: Orchestrator composed of Registry, Queue, Selector, Broker
-- **Aggregation**: Tasks aggregated into TaskQueue
-- **Dependency**: Controllers depend on Orchestrator and Registry
-- **Association**: Agents associated with Tasks through assignment
+4. **Association**
+   - Tasks are assigned to Agents
+   - Messages are sent between Agents
+   - Artifacts are produced by Tasks
+   - Metrics track Agent performance
