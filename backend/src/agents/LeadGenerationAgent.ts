@@ -56,6 +56,8 @@ export class LeadGenerationAgent extends Agent {
 Analyze this lead generation task:
 Title: ${task.title}
 Description: ${task.description}
+Available channels: ${this.channels.join(', ')}
+Preferred tactics: ${this.tactics.join(', ')}
 
 Determine:
 1. Target audience and ideal customer profile

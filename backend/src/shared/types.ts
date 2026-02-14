@@ -183,6 +183,7 @@ export interface AgentLearningProfile {
   preferredTaskTypes: TaskType[];
   learningRate: number;
   lastTrainingDate: Date;
+  learningStrategy?: 'supervised' | 'reinforced' | 'continuous';
 }
 
 export interface AgentTemplate {
@@ -236,11 +237,19 @@ export interface WorkflowStepExecution {
   error?: string;
 }
 
+export type RewardStrategy = 'success_rate' | 'feedback_bonus';
+
+export interface RewardConfig {
+  strategy: RewardStrategy;
+  successWeight?: number;
+  feedbackWeight?: number;
+}
+
 export interface ReinforcementTrainingConfig {
   agentId: string;
   modelProvider: string;
   trainingDataset: AgentTrainingData[];
-  rewardFunction: (result: any, expected: any) => number;
+  rewardConfig: RewardConfig;
   epochs: number;
   learningRate: number;
   batchSize: number;

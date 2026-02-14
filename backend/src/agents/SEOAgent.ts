@@ -52,6 +52,8 @@ export class SEOAgent extends Agent {
 Analyze this SEO task:
 Title: ${task.title}
 Description: ${task.description}
+Available tools: ${this.seoTools.join(', ')}
+Focus areas: ${this.focusAreas.join(', ')}
 
 Determine:
 1. SEO focus area (keyword research, on-page, technical, content, etc.)

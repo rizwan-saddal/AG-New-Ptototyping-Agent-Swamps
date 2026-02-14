@@ -1,7 +1,7 @@
 // Agent Selector - Intelligent agent selection based on multiple factors
 
 import type { Agent } from '../agents/Agent.js';
-import type { Task, TaskType } from '../shared/types.js';
+import type { Task } from '../shared/types.js';
 import type { AgentRegistry } from './AgentRegistry.js';
 
 interface ScoringWeights {

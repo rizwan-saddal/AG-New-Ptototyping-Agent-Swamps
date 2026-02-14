@@ -52,6 +52,8 @@ Analyze this software development task:
 Title: ${task.title}
 Description: ${task.description}
 Type: ${task.type}
+Preferred languages: ${this.programmingLanguages.join(', ')}
+Primary frameworks: ${this.frameworks.join(', ')}
 
 Determine:
 1. Programming language to use
