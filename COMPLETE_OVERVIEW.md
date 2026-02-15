@@ -117,7 +117,7 @@ This ensures:
 ## 📁 Repository Structure
 
 ```
-AG-New-Ptototyping-Agent-Swamps/
+Agency/
 ├── ARCHITECTURE.md           # High-level system architecture
 ├── CLASS_DIAGRAMS.md         # Detailed class relationships
 ├── LOW_LEVEL_DESIGN.md       # Implementation details
@@ -177,8 +177,8 @@ Docker (for containerized deployment)
 ### 2. Installation
 ```bash
 # Clone repository
-git clone https://github.com/rizwan-saddal/AG-New-Ptototyping-Agent-Swamps.git
-cd AG-New-Ptototyping-Agent-Swamps
+git clone https://github.com/rizwan-saddal/Agency.git
+cd Agency
 
 # Setup backend
 cd backend
