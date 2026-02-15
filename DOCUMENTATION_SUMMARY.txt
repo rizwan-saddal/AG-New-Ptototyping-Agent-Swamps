@@ -217,7 +217,7 @@ ALL REQUIREMENTS HAVE BEEN FULLY ADDRESSED.
                          CONTACT & RESOURCES
 ===============================================================================
 
-Repository: rizwan-saddal/AG-New-Ptototyping-Agent-Swamps
+Repository: rizwan-saddal/Agency
 Branch: copilot/define-architecture-diagram
 
 For questions or clarifications, refer to the documentation or open an issue.

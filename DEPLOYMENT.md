@@ -15,8 +15,8 @@ This guide covers deployment options for the Agent Swamps multi-agent system.
 ### 1. Clone and Setup
 
 ```bash
-git clone https://github.com/rizwan-saddal/AG-New-Ptototyping-Agent-Swamps.git
-cd AG-New-Ptototyping-Agent-Swamps
+git clone https://github.com/rizwan-saddal/Agency.git
+cd Agency
 ```
 
 ### 2. Backend Setup
@@ -283,8 +283,8 @@ sudo apt-get install -y nodejs
 
 3. Clone and setup:
 ```bash
-git clone https://github.com/rizwan-saddal/AG-New-Ptototyping-Agent-Swamps.git
-cd AG-New-Ptototyping-Agent-Swamps/backend
+git clone https://github.com/rizwan-saddal/Agency.git
+cd Agency/backend
 npm install
 npm run build
 ```

@@ -159,8 +159,8 @@ Guide to navigating all documentation.
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/rizwan-saddal/AG-New-Ptototyping-Agent-Swamps.git
-cd AG-New-Ptototyping-Agent-Swamps
+git clone https://github.com/rizwan-saddal/Agency.git
+cd Agency
 ```
 
 2. **Install Ollama**
